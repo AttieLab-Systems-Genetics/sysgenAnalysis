@@ -1,5 +1,8 @@
 # Project Walkthroughs
 
+- [2026-02-11: QTL Analysis Pipeline Refactoring](#2026-02-11-qtl-analysis-pipeline-refactoring)
+- [2026-02-16: R Package Conversion and Refactoring](#2026-02-16-r-package-conversion-and-refactoring)
+
 ## 2026-02-11: QTL Analysis Pipeline Refactoring
 
 Today's work focused on summarizing, extracting, and refactoring the core analysis infrastructure for the Diversity Outbred (DO) project.

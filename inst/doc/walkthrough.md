@@ -70,7 +70,7 @@ I created [common.R](common.R) to house shared infrastructure:
 
 ## 2026-02-16: R Package Conversion and Refactoring
 
-Today's work focused on fully converting the `sysgen_analysis` directory into a functional, best-practice R package named `sysgenAnalysis`.
+Today's work focused on fully converting the `sysgenAnalysis` directory into a functional, best-practice R package named `sysgenAnalysis`.
 
 ### 1. Package Infrastructure
 
@@ -91,5 +91,7 @@ Today's work focused on fully converting the `sysgen_analysis` directory into a 
 
 ### 4. Code Cleanup
 
+- **Package Directory Rename**: Renamed the root directory from `sysgen_analysis` to `sysgenAnalysis` for consistency with the package name.
+- **Git Remote Update**: Updated `origin` to `https://github.com/AttieLab-Systems-Genetics/sysgenAnalysis.git`.
 - **Deleted `dir.R`**: Relocated configuration logic into the package core.
 - **Documentation**: Generated full package documentation using `devtools::document()`.

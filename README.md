@@ -1,4 +1,4 @@
-# sysgen_analysis
+# sysgenAnalysis
 
 Systems Genetics Analysis
 

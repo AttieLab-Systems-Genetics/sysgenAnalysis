@@ -28,11 +28,11 @@ classes <- c("liver_genes")
 
 ```{r}
 hs_res <- run_hotspot_analysis(
-  phenotype_classes = classes,
-  qtl_model = "additive",
-  input_dir = input_path,
-  groups = c("HC", "HF", "female", "male"),
-  threshold = 15
+    phenotype_classes = classes,
+    qtl_model = "additive",
+    input_dir = input_path,
+    groups = c("HC", "HF", "female", "male"),
+    threshold = 15
 )
 ```
 
@@ -53,7 +53,7 @@ plots <- plot(hs_res)
 
 # Display all plots
 for (name in names(plots)) {
-  print(plots[[name]])
+    print(plots[[name]])
 }
 ```
 
@@ -66,23 +66,23 @@ The following code saves the records to the specified output folder.
 # Save Differential Hotspot Traits
 diff_summaries <- summary(hs_res)
 if (length(diff_summaries) > 0) {
-  diff_dir <- file.path(output_path, "Differential_Hotspots")
-  ensure_dir(diff_dir)
-  for (name in names(diff_summaries)) {
-    readr::write_csv(
-      diff_summaries[[name]],
-      file.path(diff_dir, paste0(name, "_Hotspot_Traits.csv"))
-    )
-  }
+    diff_dir <- file.path(output_path, "Differential_Hotspots")
+    ensure_dir(diff_dir)
+    for (name in names(diff_summaries)) {
+        readr::write_csv(
+            diff_summaries[[name]],
+            file.path(diff_dir, paste0(name, "_Hotspot_Traits.csv"))
+        )
+    }
 }
 
 # Save Plots
 if (length(plots) > 0) {
-  ensure_dir(output_path)
-  for (name in names(plots)) {
-    ggplot2::ggsave(file.path(output_path, paste0(name, ".png")),
-      plot = plots[[name]], width = 14, height = 7
-    )
-  }
+    ensure_dir(output_path)
+    for (name in names(plots)) {
+        ggplot2::ggsave(file.path(output_path, paste0(name, ".png")),
+            plot = plots[[name]], width = 14, height = 7
+        )
+    }
 }
 ```

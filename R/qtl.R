@@ -49,8 +49,8 @@ summarize_qtl_specificity <- function(df, group_label) {
       Unique_Metabolites = dplyr::n_distinct(phenotype),
       Avg_LOD = mean(qtl_lod, na.rm = TRUE)
     ) |>
-    dplyr::mutate(Group = group_label) |>
-    dplyr::select(Group, qtl_status, Count, Unique_Metabolites, Avg_LOD)
+    dplyr::mutate(group = group_label) |>
+    dplyr::select(group, qtl_status, Count, Unique_Metabolites, Avg_LOD)
 
   return(summary)
 }
@@ -204,7 +204,7 @@ run_qtl_analysis <- function(phenotype_classes,
         all_peaks[[paste0(t_class, "_", grp)]] <- df |>
           dplyr::select(phenotype, qtl_chr, qtl_pos, qtl_lod) |>
           dplyr::mutate(
-            trait_class = t_class, context = grp,
+            trait_class = t_class, group = grp,
             qtl_chr = as.character(qtl_chr),
             qtl_chr = ifelse(qtl_chr == "20", "X", qtl_chr)
           )
@@ -350,7 +350,7 @@ plot.qtl_analysis <- function(x, ...) {
     "clinical_traits" = "#984EA3", "liver_lipids" = "#4DAF4A",
     "liver_metabolites_labeled" = "#E41A1C", "plasma_metabolites" = "#377EB8"
   )
-  context_shapes <- c("HC" = 21, "HF" = 24, "female" = 22, "male" = 23)
+  group_shapes <- c("HC" = 21, "HF" = 24, "female" = 22, "male" = 23)
 
   top_10_hs <- x$top_10_hs
   top_10_hs$label <- paste0("Chr", top_10_hs$qtl_chr, ":", round(top_10_hs$pos_at_max, 1), "Mb")
@@ -369,7 +369,7 @@ plot.qtl_analysis <- function(x, ...) {
       ),
       color = "black", linetype = "dotted", linewidth = 0.75, alpha = 1.0, inherit.aes = FALSE
     ) +
-    ggplot2::geom_point(ggplot2::aes(fill = trait_class, shape = context),
+    ggplot2::geom_point(ggplot2::aes(fill = trait_class, shape = group),
       size = 6, color = "black", stroke = 0.3, alpha = 0.7
     ) +
     ggplot2::geom_text(
@@ -378,7 +378,7 @@ plot.qtl_analysis <- function(x, ...) {
       color = "black", fontface = "bold", inherit.aes = FALSE
     ) +
     ggplot2::scale_fill_manual(values = class_colors, name = "Trait Class:  ") +
-    ggplot2::scale_shape_manual(values = context_shapes, name = "Context (Shape):  ") +
+    ggplot2::scale_shape_manual(values = group_shapes, name = "Group (Shape):  ") +
     ggplot2::scale_x_continuous(label = GLOBAL_MAP$Chr, breaks = GLOBAL_MAP$center, expand = c(0, 0)) +
     ggplot2::scale_y_continuous(limits = c(0, 105), breaks = seq(0, 100, 20)) +
     ggplot2::guides(
@@ -387,7 +387,7 @@ plot.qtl_analysis <- function(x, ...) {
     ) +
     ggplot2::labs(
       title = "Integrated Multi-Class Manhattan Plot",
-      subtitle = paste("Points shaped by Context | Ranked by", x$params$rank_by),
+      subtitle = paste("Points shaped by Group | Ranked by", x$params$rank_by),
       x = "Chromosome (GRCm39 Mb)", y = "LOD Score"
     ) +
     ggplot2::theme_minimal(base_size = 14) +

@@ -8,7 +8,6 @@ run_qtl_analysis(
   phenotype_classes,
   qtl_model = "additive",
   input_dir,
-  output_dir,
   groups = c("HC", "HF", "female", "male"),
   gap_limit = 4,
   rank_by = "Diversity",
@@ -22,8 +21,6 @@ run_qtl_analysis(
 
 \item{input_dir}{Directory containing peak summary CSV files.}
 
-\item{output_dir}{Directory to save results.}
-
 \item{groups}{Character vector of groups (default c("HC", "HF", "female", "male")).}
 
 \item{gap_limit}{Distance in Mb to group peaks into hotspots (default 4.0).}
@@ -31,6 +28,9 @@ run_qtl_analysis(
 \item{rank_by}{Hotspot ranking criteria ("Diversity" or "Density").}
 
 \item{pt_size}{Point size for plots (default 7.0).}
+}
+\value{
+An object of class \code{qtl_analysis}.
 }
 \description{
 Automates data loading, specificity analysis, hotspot identification, and visualization.

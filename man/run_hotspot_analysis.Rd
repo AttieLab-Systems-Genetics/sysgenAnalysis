@@ -8,7 +8,6 @@ run_hotspot_analysis(
   phenotype_classes,
   qtl_model = "additive",
   input_dir,
-  output_dir,
   groups = c("HC", "HF", "female", "male"),
   window_size_mb = 1,
   step_mb = 0.5,
@@ -22,8 +21,6 @@ run_hotspot_analysis(
 
 \item{input_dir}{Directory containing peak summary CSV files.}
 
-\item{output_dir}{Directory to save results.}
-
 \item{groups}{Character vector of groups (default c("HC", "HF", "female", "male")).}
 
 \item{window_size_mb}{Window size for density calculation (default 1).}
@@ -33,7 +30,7 @@ run_hotspot_analysis(
 \item{threshold}{Threshold for identifying differential hotspots (default 15).}
 }
 \value{
-None (saves files and plots).
+An object of class \code{hotspot_analysis}.
 }
 \description{
 Automates data loading, density calculation, differential analysis, and visualization.

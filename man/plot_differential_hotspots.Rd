@@ -4,13 +4,7 @@
 \alias{plot_differential_hotspots}
 \title{Plot Differential Hotspots}
 \usage{
-plot_differential_hotspots(
-  density_data,
-  group_names,
-  title,
-  filename,
-  output_dir
-)
+plot_differential_hotspots(density_data, group_names, title)
 }
 \arguments{
 \item{density_data}{Combined density data for two groups.}
@@ -18,10 +12,6 @@ plot_differential_hotspots(
 \item{group_names}{A vector of two group names (e.g., c("Female", "Male")).}
 
 \item{title}{Plot title.}
-
-\item{filename}{Name of the file to save (PNG).}
-
-\item{output_dir}{Directory to save the plot.}
 }
 \value{
 A ggplot object.

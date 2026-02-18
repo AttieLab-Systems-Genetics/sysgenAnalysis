@@ -24,11 +24,16 @@ load_trans_eqtls <- function(dir, filename, group_label) {
 
   df <- data.table::fread(path) |>
     tibble::as_tibble() |>
-    dplyr::filter(cis == FALSE) |>
-    # Ensure positions are in Mb if they look like bp
-    dplyr::mutate(qtl_pos = dplyr::if_else(max(qtl_pos, na.rm = TRUE) > 10000, qtl_pos / 1e6, qtl_pos)) |>
+    dplyr::filter(cis == FALSE)
+
+  # Ensure positions are in Mb if they look like bp
+  if (nrow(df) > 0 && max(df$qtl_pos, na.rm = TRUE) > 10000) {
+    df$qtl_pos <- df$qtl_pos / 1e6
+  }
+
+  df <- df |>
     dplyr::select(qtl_chr, qtl_pos, gene_symbol) |>
-    dplyr::mutate(Group = group_label)
+    dplyr::mutate(group = group_label)
 
   return(df)
 }
@@ -90,7 +95,7 @@ plot_hotspots <- function(density_data, title) {
   # Clean up chromosome levels for plotting using common helper
   density_data$qtl_chr <- clean_chr_factor(density_data$qtl_chr)
 
-  p <- ggplot2::ggplot(density_data, ggplot2::aes(x = pos_mb, y = count, color = Group)) +
+  p <- ggplot2::ggplot(density_data, ggplot2::aes(x = pos_mb, y = count, color = group)) +
     ggplot2::geom_line(linewidth = 0.8) +
     ggplot2::facet_wrap(~qtl_chr, scales = "free_x", nrow = 2) +
     ggplot2::theme_minimal() +
@@ -125,10 +130,10 @@ plot_hotspots <- function(density_data, title) {
 find_differential_hotspots <- function(density_data, raw_data, threshold = 10) {
   # 1. Pivot data to compare groups side-by-side
   comparison <- density_data |>
-    tidyr::pivot_wider(names_from = Group, values_from = count, values_fill = 0)
+    tidyr::pivot_wider(names_from = group, values_from = count, values_fill = 0)
 
   # Get group names dynamically
-  groups <- unique(density_data$Group)
+  groups <- unique(density_data$group)
   col1 <- groups[1]
   col2 <- groups[2]
 
@@ -182,7 +187,7 @@ find_differential_hotspots <- function(density_data, raw_data, threshold = 10) {
 plot_differential_hotspots <- function(density_data, group_names, title) {
   # Pivot to calculate the difference
   diff_plot_data <- density_data |>
-    tidyr::pivot_wider(names_from = Group, values_from = count, values_fill = 0) |>
+    tidyr::pivot_wider(names_from = group, values_from = count, values_fill = 0) |>
     dplyr::mutate(
       diff = .data[[group_names[1]]] - .data[[group_names[2]]],
       Dominant_Group = ifelse(diff > 0, group_names[1], group_names[2])
@@ -256,7 +261,7 @@ run_hotspot_analysis <- function(phenotype_classes,
 
       if (nrow(diet_data) > 0) {
         diet_density <- diet_data |>
-          dplyr::group_by(Group) |>
+          dplyr::group_by(group) |>
           dplyr::do(calculate_hotspot_density(., window_size_mb = window_size_mb, step_mb = step_mb))
 
         diet_diff_traits <- find_differential_hotspots(diet_density, diet_data, threshold = threshold)
@@ -278,7 +283,7 @@ run_hotspot_analysis <- function(phenotype_classes,
 
       if (nrow(sex_data) > 0) {
         sex_density <- sex_data |>
-          dplyr::group_by(Group) |>
+          dplyr::group_by(group) |>
           dplyr::do(calculate_hotspot_density(., window_size_mb = window_size_mb, step_mb = step_mb))
 
         sex_diff_traits <- find_differential_hotspots(sex_density, sex_data, threshold = threshold)

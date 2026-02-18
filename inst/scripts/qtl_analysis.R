@@ -3,6 +3,9 @@
 # ===============================================================
 
 # 1. Setup Environment
+if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
+  devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
+}
 library(sysgenAnalysis)
 
 # 2. Configuration

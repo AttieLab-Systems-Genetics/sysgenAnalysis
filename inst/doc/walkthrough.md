@@ -6,6 +6,7 @@ The [Script Transformation Prompt](prompt.md) provides a concise summary of the 
 - [2026-02-16: R Package Conversion and Refactoring](#2026-02-16-r-package-conversion-and-refactoring)
 - [2026-02-18: S3 Class Refactoring for QTL and Hotspot Analysis](#2026-02-18-s3-class-refactoring-for-qtl-and-hotspot-analysis)
 - [2026-02-18: Interactive Quarto Reports](#2026-02-18-interactive-quarto-reports)
+- [2026-02-18: Bug Fixes and Automation Improvements](#2026-02-18-bug-fixes-and-automation-improvements)
 
 ## 2026-02-11: QTL Analysis Pipeline Refactoring
 
@@ -144,3 +145,35 @@ quarto render inst/scripts/hotspot_analysis.qmd
 ```
 
 Within RStudio, simply open the `.qmd` file and click the **Render** button. These reports display plots inline and include a "Data Persistence" section that is disabled by default (to avoid accidental overwrites) but can be enabled to save the analysis artifacts.
+
+## 2026-02-18: Bug Fixes and Automation Improvements
+
+The final phase of today's work addressed unexpected bugs discovered during verification and improved the package's portability.
+
+### 1. Identify Hotspots Argument Fix
+
+Resolved an error where `identify_hotspots` could not find the `group` column. I standardized the grouping column name to lowercase `group` across the entire package (`R/qtl.R` and `R/hotspot.R`) to ensure seamless integration between logic and plotting.
+
+### 2. Load Trans eQTLs Vector Fix
+
+Fixed a vector length recycling error in `load_trans_eqtls` that caused the hotspot analysis to fail when automatically converting base-pair positions to megabases. The fix ensures that position scaling is applied correctly to the entire dataset.
+
+### 3. Conditional Package Installation
+
+Added logic to all analysis scripts and Quarto documents in `inst/scripts/` to check for `sysgenAnalysis` and automatically install it from GitHub if it's not present. This makes the scripts truly standalone for collaborators.
+
+```r
+if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
+  devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
+}
+library(sysgenAnalysis)
+```
+
+### 4. README and Workflow Finalization
+
+- **README**: Updated with robust instructions for sourcing scripts from an installed package using `system.file()`.
+- **Walkthrough**: Updated workflow references to use descriptive location text for Research Drive and Box files.
+
+### 5. Verified Both Analysis Pipelines
+
+Successfully ran and verified the outputs for both `qtl_analysis.R` and `hotspot_analysis.R` following the fixes.

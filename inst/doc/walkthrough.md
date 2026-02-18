@@ -1,5 +1,7 @@
 # Project Walkthroughs
 
+The [Script Transformation Prompt](prompt.md) provides a concise summary of the standard refactoring process used in this project.
+
 - [2026-02-11: QTL Analysis Pipeline Refactoring](#2026-02-11-qtl-analysis-pipeline-refactoring)
 - [2026-02-16: R Package Conversion and Refactoring](#2026-02-16-r-package-conversion-and-refactoring)
 - [2026-02-18: S3 Class Refactoring for QTL and Hotspot Analysis](#2026-02-18-s3-class-refactoring-for-qtl-and-hotspot-analysis)

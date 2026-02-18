@@ -1,11 +1,19 @@
-# ==========================================
-# Trans-eQTL Hotspot Analysis Pipeline
-# ==========================================
+---
+title: "Trans-eQTL Hotspot Analysis"
+author: "sysgenAnalysis"
+format: html
+---
 
-# 1. Setup Environment
+## Setup Environment
+
+```{r}
+#| message: false
 library(sysgenAnalysis)
+```
 
-# 2. Configuration
+## Configuration
+
+```{r}
 data_dir <- research_dir()
 save_dir <- "byandell/output"
 
@@ -13,9 +21,12 @@ input_path <- file.path(data_dir, "annotated_peak_summaries")
 base_output <- file.path(save_dir, "eQTL_Analysis")
 output_path <- file.path(base_output, "Hotspots")
 
-classes <- c("liver_genes") # Can be extended to more classes
+classes <- c("liver_genes")
+```
 
-# 3. Execution
+## Execution
+
+```{r}
 hs_res <- run_hotspot_analysis(
   phenotype_classes = classes,
   qtl_model = "additive",
@@ -24,10 +35,35 @@ hs_res <- run_hotspot_analysis(
   groups = c("HC", "HF", "female", "male"),
   threshold = 15
 )
+```
 
-# 4. Results & Persistence
+## Results
+
+### Summary
+
+```{r}
 print(hs_res)
+```
 
+### Diagnostic Plots
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+plots <- plot(hs_res)
+
+# Display all plots
+for (name in names(plots)) {
+  print(plots[[name]])
+}
+```
+
+## Data Persistence
+
+The following code saves the records to the specified output folder.
+
+```{r}
+#| eval: false
 # Save Differential Hotspot Traits
 diff_summaries <- summary(hs_res)
 if (length(diff_summaries) > 0) {
@@ -42,7 +78,6 @@ if (length(diff_summaries) > 0) {
 }
 
 # Save Plots
-plots <- plot(hs_res)
 if (length(plots) > 0) {
   ensure_dir(output_path)
   for (name in names(plots)) {
@@ -51,5 +86,4 @@ if (length(plots) > 0) {
     )
   }
 }
-
-message("Hotspot analysis results saved to: ", output_path)
+```

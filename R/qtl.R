@@ -171,6 +171,8 @@ identify_hotspots <- function(df, gap_limit) {
 #' @param rank_by Hotspot ranking criteria ("Diversity" or "Density").
 #' @param pt_size Point size for plots (default 7.0).
 #'
+#' @return An object of class `qtl_analysis`.
+#'
 #' @importFrom data.table fread
 #' @importFrom dplyr select mutate bind_rows filter rowwise ungroup arrange group_by summarise n_distinct desc inner_join rename
 #' @importFrom ggplot2 ggplot aes geom_rect geom_segment geom_point geom_text scale_fill_manual scale_shape_manual scale_x_continuous scale_y_continuous guides guide_legend labs theme_minimal theme element_blank ggsave
@@ -184,10 +186,6 @@ run_qtl_analysis <- function(phenotype_classes,
                              gap_limit = 4.0,
                              rank_by = "Diversity",
                              pt_size = 7.0) {
-  ensure_dir(output_dir)
-  hotspot_dir <- file.path(output_dir, "Hotspot_Analysis")
-  ensure_dir(hotspot_dir)
-
   all_peaks <- list()
   qtl_summaries <- list()
 
@@ -220,9 +218,6 @@ run_qtl_analysis <- function(phenotype_classes,
       diet_comp <- get_specificity(dats$HC, dats$HF)
       qtl_summaries[[paste0(t_class, "_HC")]] <- summarize_qtl_specificity(diet_comp$a_final, paste(t_class, "HC Diet"))
       qtl_summaries[[paste0(t_class, "_HF")]] <- summarize_qtl_specificity(diet_comp$b_final, paste(t_class, "HF Diet"))
-
-      generate_clean_manhattan(diet_comp$a_final, paste0(t_class, "_HC"), output_dir, pt_size)
-      generate_clean_manhattan(diet_comp$b_final, paste0(t_class, "_HF"), output_dir, pt_size)
     }
 
     if (all(c("female", "male") %in% names(dats))) {
@@ -230,19 +225,21 @@ run_qtl_analysis <- function(phenotype_classes,
       sex_comp <- get_specificity(dats$female, dats$male)
       qtl_summaries[[paste0(t_class, "_female")]] <- summarize_qtl_specificity(sex_comp$a_final, paste(t_class, "Female Sex"))
       qtl_summaries[[paste0(t_class, "_male")]] <- summarize_qtl_specificity(sex_comp$b_final, paste(t_class, "Male Sex"))
-
-      generate_clean_manhattan(sex_comp$a_final, paste0(t_class, "_Female"), output_dir, pt_size)
-      generate_clean_manhattan(sex_comp$b_final, paste0(t_class, "_Male"), output_dir, pt_size)
     }
   }
 
   # Final Summaries
-  if (length(qtl_summaries) > 0) {
-    summary_table <- dplyr::bind_rows(qtl_summaries)
-    utils::write.csv(summary_table, file.path(output_dir, "QTL_Specificity_Summary_Table.csv"), row.names = FALSE)
+  summary_table <- if (length(qtl_summaries) > 0) {
+    dplyr::bind_rows(qtl_summaries)
+  } else {
+    NULL
   }
 
   # Hotspot Analysis
+  final_hs <- NULL
+  plot_data <- NULL
+  top_10_hs <- NULL
+
   if (length(all_peaks) > 0) {
     master_peaks <- dplyr::bind_rows(all_peaks)
     all_clusters <- identify_hotspots(master_peaks, gap_limit = gap_limit)
@@ -259,19 +256,10 @@ run_qtl_analysis <- function(phenotype_classes,
       dplyr::select(-counts, -has_2_plus, -has_other) |>
       dplyr::arrange(dplyr::desc(Total_Traits))
 
-    utils::write.csv(final_hs, file.path(hotspot_dir, "Global_Hotspot_Summary_Ranked.csv"), row.names = FALSE)
-
     # Integrated Manhattan Plot
     plot_data <- master_peaks |>
       dplyr::inner_join(GLOBAL_MAP |> dplyr::rename(qtl_chr = Chr), by = "qtl_chr") |>
       dplyr::mutate(cum_pos = qtl_pos + offset)
-
-    # Redefine colors/shapes inside or via global
-    class_colors <- c(
-      "clinical_traits" = "#984EA3", "liver_lipids" = "#4DAF4A",
-      "liver_metabolites_labeled" = "#E41A1C", "plasma_metabolites" = "#377EB8"
-    )
-    context_shapes <- c("HC" = 21, "HF" = 24, "female" = 22, "male" = 23)
 
     hotspots <- plot_data |>
       dplyr::arrange(qtl_chr, qtl_pos) |>
@@ -296,57 +284,121 @@ run_qtl_analysis <- function(phenotype_classes,
         dplyr::arrange(dplyr::desc(Total_Traits)) |>
         utils::head(10)
     }
-
-    if (nrow(top_10_hs) > 0) {
-      top_10_hs$label <- paste0("Chr", top_10_hs$qtl_chr, ":", round(top_10_hs$pos_at_max, 1), "Mb")
-
-      p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = cum_pos, y = qtl_lod)) +
-        ggplot2::geom_rect(
-          data = GLOBAL_MAP |> dplyr::filter(dplyr::row_number() %% 2 == 0),
-          ggplot2::aes(xmin = offset, xmax = offset + Length, ymin = 0, ymax = Inf),
-          fill = "grey95", color = NA, inherit.aes = FALSE
-        ) +
-        ggplot2::geom_segment(
-          data = top_10_hs,
-          ggplot2::aes(
-            x = cum_center, xend = cum_center,
-            y = max_lod + 2, yend = 92
-          ),
-          color = "black", linetype = "dotted", linewidth = 0.75, alpha = 1.0, inherit.aes = FALSE
-        ) +
-        ggplot2::geom_point(ggplot2::aes(fill = trait_class, shape = context),
-          size = 6, color = "black", stroke = 0.3, alpha = 0.7
-        ) +
-        ggplot2::geom_text(
-          data = top_10_hs, ggplot2::aes(x = cum_center, y = 95, label = label),
-          angle = 90, vjust = -0.5, size = 14 * 0.3,
-          color = "black", fontface = "bold", inherit.aes = FALSE
-        ) +
-        ggplot2::scale_fill_manual(values = class_colors, name = "Trait Class:  ") +
-        ggplot2::scale_shape_manual(values = context_shapes, name = "Context (Shape):  ") +
-        ggplot2::scale_x_continuous(label = GLOBAL_MAP$Chr, breaks = GLOBAL_MAP$center, expand = c(0, 0)) +
-        ggplot2::scale_y_continuous(limits = c(0, 105), breaks = seq(0, 100, 20)) +
-        ggplot2::guides(
-          fill = ggplot2::guide_legend(override.aes = list(shape = 21, size = 4)),
-          shape = ggplot2::guide_legend(override.aes = list(fill = "grey70", size = 4))
-        ) +
-        ggplot2::labs(
-          title = "Integrated Multi-Class Manhattan Plot",
-          subtitle = paste("Points shaped by Context | Ranked by", rank_by),
-          x = "Chromosome (GRCm39 Mb)", y = "LOD Score"
-        ) +
-        ggplot2::theme_minimal(base_size = 14) +
-        ggplot2::theme(
-          panel.grid.major.x = ggplot2::element_blank(),
-          panel.grid.minor = ggplot2::element_blank(),
-          legend.position = "bottom",
-          legend.box = "vertical"
-        )
-
-      fname <- paste0("Global_Hotspot_Manhattan_Ranked_by_", rank_by, ".png")
-      ggplot2::ggsave(file.path(hotspot_dir, fname), p, width = 16, height = 8, dpi = 600)
-    }
   }
 
-  message("QTL analysis complete. Results saved to: ", output_dir)
+  res <- list(
+    summary_table = summary_table,
+    final_hs = final_hs,
+    plot_data = plot_data,
+    top_10_hs = top_10_hs,
+    params = list(
+      phenotype_classes = phenotype_classes,
+      groups = groups,
+      rank_by = rank_by,
+      pt_size = pt_size
+    )
+  )
+  class(res) <- "qtl_analysis"
+
+  message("QTL analysis complete.")
+  return(res)
+}
+
+#' Print QTL Analysis Result
+#'
+#' @param x An object of class `qtl_analysis`.
+#' @param ... Extra arguments (ignored).
+#'
+#' @export
+print.qtl_analysis <- function(x, ...) {
+  cat("QTL Analysis Result Object\n")
+  cat("--------------------------\n")
+  cat("Trait Classes: ", paste(x$params$phenotype_classes, collapse = ", "), "\n")
+  cat("Groups:        ", paste(x$params$groups, collapse = ", "), "\n")
+  if (!is.null(x$final_hs)) {
+    cat("Hotspots Found: ", nrow(x$final_hs), "\n")
+  }
+}
+
+#' Summary of QTL Analysis
+#'
+#' @param object An object of class `qtl_analysis`.
+#' @param ... Extra arguments (ignored).
+#'
+#' @return A data frame containing the QTL specificity summary.
+#'
+#' @export
+summary.qtl_analysis <- function(object, ...) {
+  return(object$summary_table)
+}
+
+#' Plot QTL Analysis
+#'
+#' @param x An object of class `qtl_analysis`.
+#' @param ... Extra arguments (passed to ggsave if saving).
+#'
+#' @return A ggplot object.
+#'
+#' @importFrom ggplot2 ggplot aes geom_rect geom_segment geom_point geom_text scale_fill_manual scale_shape_manual scale_x_continuous scale_y_continuous guides guide_legend labs theme_minimal theme element_blank
+#' @export
+plot.qtl_analysis <- function(x, ...) {
+  if (is.null(x$plot_data) || is.null(x$top_10_hs)) {
+    warning("No plot data available.")
+    return(NULL)
+  }
+
+  # Redefine colors/shapes inside or via global
+  class_colors <- c(
+    "clinical_traits" = "#984EA3", "liver_lipids" = "#4DAF4A",
+    "liver_metabolites_labeled" = "#E41A1C", "plasma_metabolites" = "#377EB8"
+  )
+  context_shapes <- c("HC" = 21, "HF" = 24, "female" = 22, "male" = 23)
+
+  top_10_hs <- x$top_10_hs
+  top_10_hs$label <- paste0("Chr", top_10_hs$qtl_chr, ":", round(top_10_hs$pos_at_max, 1), "Mb")
+
+  p <- ggplot2::ggplot(x$plot_data, ggplot2::aes(x = cum_pos, y = qtl_lod)) +
+    ggplot2::geom_rect(
+      data = GLOBAL_MAP |> dplyr::filter(dplyr::row_number() %% 2 == 0),
+      ggplot2::aes(xmin = offset, xmax = offset + Length, ymin = 0, ymax = Inf),
+      fill = "grey95", color = NA, inherit.aes = FALSE
+    ) +
+    ggplot2::geom_segment(
+      data = top_10_hs,
+      ggplot2::aes(
+        x = cum_center, xend = cum_center,
+        y = max_lod + 2, yend = 92
+      ),
+      color = "black", linetype = "dotted", linewidth = 0.75, alpha = 1.0, inherit.aes = FALSE
+    ) +
+    ggplot2::geom_point(ggplot2::aes(fill = trait_class, shape = context),
+      size = 6, color = "black", stroke = 0.3, alpha = 0.7
+    ) +
+    ggplot2::geom_text(
+      data = top_10_hs, ggplot2::aes(x = cum_center, y = 95, label = label),
+      angle = 90, vjust = -0.5, size = 14 * 0.3,
+      color = "black", fontface = "bold", inherit.aes = FALSE
+    ) +
+    ggplot2::scale_fill_manual(values = class_colors, name = "Trait Class:  ") +
+    ggplot2::scale_shape_manual(values = context_shapes, name = "Context (Shape):  ") +
+    ggplot2::scale_x_continuous(label = GLOBAL_MAP$Chr, breaks = GLOBAL_MAP$center, expand = c(0, 0)) +
+    ggplot2::scale_y_continuous(limits = c(0, 105), breaks = seq(0, 100, 20)) +
+    ggplot2::guides(
+      fill = ggplot2::guide_legend(override.aes = list(shape = 21, size = 4)),
+      shape = ggplot2::guide_legend(override.aes = list(fill = "grey70", size = 4))
+    ) +
+    ggplot2::labs(
+      title = "Integrated Multi-Class Manhattan Plot",
+      subtitle = paste("Points shaped by Context | Ranked by", x$params$rank_by),
+      x = "Chromosome (GRCm39 Mb)", y = "LOD Score"
+    ) +
+    ggplot2::theme_minimal(base_size = 14) +
+    ggplot2::theme(
+      panel.grid.major.x = ggplot2::element_blank(),
+      panel.grid.minor = ggplot2::element_blank(),
+      legend.position = "bottom",
+      legend.box = "vertical"
+    )
+
+  return(p)
 }

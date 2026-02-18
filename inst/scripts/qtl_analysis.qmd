@@ -1,11 +1,19 @@
-# ===============================================================
-# QTL Analysis Pipeline: Specificity & Hotspots
-# ===============================================================
+---
+title: "QTL Analysis: Specificity & Hotspots"
+author: "sysgenAnalysis"
+format: html
+---
 
-# 1. Setup Environment
+## Setup Environment
+
+```{r}
+#| message: false
 library(sysgenAnalysis)
+```
 
-# 2. Configuration
+## Configuration
+
+```{r}
 data_dir <- research_dir()
 save_dir <- "byandell/output"
 
@@ -18,8 +26,11 @@ trait_classes <- c(
   "liver_lipids",
   "clinical_traits"
 )
+```
 
-# 3. Execution
+## Execution
+
+```{r}
 qtl_res <- run_qtl_analysis(
   phenotype_classes = trait_classes,
   qtl_model = "additive",
@@ -28,12 +39,40 @@ qtl_res <- run_qtl_analysis(
   groups = c("HC", "HF", "female", "male"),
   rank_by = "Diversity"
 )
+```
 
-# 4. Results & Persistence
+## Results
+
+### Summary
+
+```{r}
 print(qtl_res)
+```
 
-# Save Specificity Summary
+### Specificity Table
+
+```{r}
 summary_table <- summary(qtl_res)
+if (!is.null(summary_table)) {
+  knitr::kable(summary_table)
+}
+```
+
+### Manhattan Plot
+
+```{r}
+#| fig-width: 16
+#| fig-height: 8
+plot(qtl_res)
+```
+
+## Data Persistence
+
+The following code saves the records to the specified output folder.
+
+```{r}
+#| eval: false
+# Save Specificity Summary
 if (!is.null(summary_table)) {
   ensure_dir(output_path)
   write.csv(summary_table,
@@ -60,5 +99,4 @@ if (!is.null(p)) {
   fname <- paste0("Global_Hotspot_Manhattan_Ranked_by_", qtl_res$params$rank_by, ".png")
   ggplot2::ggsave(file.path(hotspot_dir, fname), p, width = 16, height = 8, dpi = 600)
 }
-
-message("Results saved to: ", output_path)
+```

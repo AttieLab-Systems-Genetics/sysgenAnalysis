@@ -2,6 +2,8 @@
 
 - [2026-02-11: QTL Analysis Pipeline Refactoring](#2026-02-11-qtl-analysis-pipeline-refactoring)
 - [2026-02-16: R Package Conversion and Refactoring](#2026-02-16-r-package-conversion-and-refactoring)
+- [2026-02-18: S3 Class Refactoring for QTL and Hotspot Analysis](#2026-02-18-s3-class-refactoring-for-qtl-and-hotspot-analysis)
+- [2026-02-18: Interactive Quarto Reports](#2026-02-18-interactive-quarto-reports)
 
 ## 2026-02-11: QTL Analysis Pipeline Refactoring
 
@@ -60,16 +62,17 @@ I created [common.R](common.R) to house shared infrastructure:
 - Run the analysis scripts:
 
   ```r
-  source("byandell/qtl_analysis.R")
-  source("byandell/hotspot_analysis.R")
+  source("inst/scripts/qtl_analysis.R")
+  source("inst/scripts/hotspot_analysis.R")
   ```
 
 - Or source the libraries (always source `common.R` first if loading individually):
 
   ```r
-  source("byandell/common.R")
-  source("byandell/qtl.R")
-  source("byandell/hotspot.R")
+  source("R/common.R")
+  source("R/qtl.R")
+  source("R/hotspot.R")
+  ```
 
 ## 2026-02-16: R Package Conversion and Refactoring
 
@@ -98,3 +101,45 @@ Today's work focused on fully converting the `sysgenAnalysis` directory into a f
 - **Git Remote Update**: Updated `origin` to `https://github.com/AttieLab-Systems-Genetics/sysgenAnalysis.git`.
 - **Deleted `dir.R`**: Relocated configuration logic into the package core.
 - **Documentation**: Generated full package documentation using `devtools::document()`.
+
+## 2026-02-18: S3 Class Refactoring for QTL and Hotspot Analysis
+
+Today's work refactored both the QTL and Hotspot analysis pipelines to use a more idiomatic R approach with S3 classes. This change separates the heavy lifting of the analysis from data persistence, providing more flexibility and better organization.
+
+### 1. QTL Analysis S3 Refactor
+
+- **S3 Class `qtl_analysis`**: Modified `run_qtl_analysis()` to return an object of class `qtl_analysis`.
+- **Methods**: Implemented `print()`, `summary()`, and `plot()` methods for the `qtl_analysis` class.
+- **Modularity**: Removed internal file saving logic from `run_qtl_analysis()`.
+
+### 2. Hotspot Analysis S3 Refactor
+
+- **S3 Class `hotspot_analysis`**: Modified `run_hotspot_analysis()` to return an object of class `hotspot_analysis`.
+- **Plotting Functions**: Refactored `plot_hotspots()` and `plot_differential_hotspots()` to return `ggplot` objects instead of saving them internally.
+- **Methods**: Implemented `print()`, `summary()`, and `plot()` methods for the `hotspot_analysis` class.
+
+### 3. Updated Entry Point Scripts
+
+- **`qtl_analysis.R`**: Updated to capture the `qtl_analysis` object and handle file saving locally.
+- **`hotspot_analysis.R`**: Updated to capture the `hotspot_analysis` object and use the new methods to inspect, summarize, and plot results.
+
+## 2026-02-18: Interactive Quarto Reports
+
+I've converted the core analysis scripts into Quarto markdown (`.qmd`) documents. These files provide an interactive and visually rich way to explore the results, combining documentation, code, and live plots.
+
+### 1. New Quarto Documents
+
+- **`qtl_analysis.qmd`**: A full report for QTL specificity and integrated Manhattan plotting.
+- **`hotspot_analysis.qmd`**: A report for trans-eQTL hotspot density and differential analysis.
+
+### 2. How to Use
+
+You can render these reports to HTML or PDF using the Quarto CLI or RStudio:
+
+```bash
+# From the terminal
+quarto render inst/scripts/qtl_analysis.qmd
+quarto render inst/scripts/hotspot_analysis.qmd
+```
+
+Within RStudio, simply open the `.qmd` file and click the **Render** button. These reports display plots inline and include a "Data Persistence" section that is disabled by default (to avoid accidental overwrites) but can be enabled to save the analysis artifacts.

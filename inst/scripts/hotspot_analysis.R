@@ -20,7 +20,6 @@ hs_res <- run_hotspot_analysis(
   phenotype_classes = classes,
   qtl_model = "additive",
   input_dir = input_path,
-  output_dir = output_path,
   groups = c("HC", "HF", "female", "male"),
   threshold = 15
 )

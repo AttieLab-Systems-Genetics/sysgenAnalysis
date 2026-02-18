@@ -24,7 +24,6 @@ qtl_res <- run_qtl_analysis(
   phenotype_classes = trait_classes,
   qtl_model = "additive",
   input_dir = input_path,
-  output_dir = output_path,
   groups = c("HC", "HF", "female", "male"),
   rank_by = "Diversity"
 )

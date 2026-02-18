@@ -223,7 +223,6 @@ plot_differential_hotspots <- function(density_data, group_names, title) {
 #' @param phenotype_classes Character vector of phenotype classes to analyze.
 #' @param qtl_model QTL model used (e.g., "additive").
 #' @param input_dir Directory containing peak summary CSV files.
-#' @param output_dir Directory to save results.
 #' @param groups Character vector of groups (default c("HC", "HF", "female", "male")).
 #' @param window_size_mb Window size for density calculation (default 1).
 #' @param step_mb Step size for density calculation (default 0.5).
@@ -237,7 +236,6 @@ plot_differential_hotspots <- function(density_data, group_names, title) {
 run_hotspot_analysis <- function(phenotype_classes,
                                  qtl_model = "additive",
                                  input_dir,
-                                 output_dir,
                                  groups = c("HC", "HF", "female", "male"),
                                  window_size_mb = 1,
                                  step_mb = 0.5,

@@ -165,7 +165,6 @@ identify_hotspots <- function(df, gap_limit) {
 #' @param phenotype_classes Character vector of phenotype classes to analyze.
 #' @param qtl_model QTL model used (e.g., "additive").
 #' @param input_dir Directory containing peak summary CSV files.
-#' @param output_dir Directory to save results.
 #' @param groups Character vector of groups (default c("HC", "HF", "female", "male")).
 #' @param gap_limit Distance in Mb to group peaks into hotspots (default 4.0).
 #' @param rank_by Hotspot ranking criteria ("Diversity" or "Density").
@@ -181,7 +180,6 @@ identify_hotspots <- function(df, gap_limit) {
 run_qtl_analysis <- function(phenotype_classes,
                              qtl_model = "additive",
                              input_dir,
-                             output_dir,
                              groups = c("HC", "HF", "female", "male"),
                              gap_limit = 4.0,
                              rank_by = "Diversity",

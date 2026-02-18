@@ -17,12 +17,12 @@ I created a new file [initial_pipeline.md](initial_pipeline.md) which provides a
 
 ### 2. Verified Context
 
-I used the existing <file:///Users/brianyandell/Library/CloudStorage/Box-Box/R_stuff/Workflow%20summaries/Context%20review%20DO%20eQTL%20and%20correlation%20analysis.md> as a guide to ensure consistency in terminology and scope.
+I used the existing `Context review DO eQTL and correlation analysis.md`
+in Box folder `R_stuff/Workflow summaries` as a guide to ensure consistency in terminology and scope.
 
 ### 3. Extracted QTL Analysis Functions
 
-I extracted core functions from the <file:///Volumes/mkeller3/General/Projects2/R%20scripts/Standalone%20script%20for%20analyzing%20diet%20and%20sex%20specific%20liver%20metabolite%20QTL.R>
-into [qtl.R](qtl.R).
+I extracted core functions from the `Standalone script for analyzing diet and sex specific liver metabolite QTL.R` in Research Drive folder `mkeller3/General/Projects2/R scripts` into [qtl.R](qtl.R).
 
 - **Functions Extracted**: `get_specificity`, `summarize_qtl_specificity`, `generate_clean_manhattan`, and `identify_hotspots`.
 - **Documentation**: All functions are documented using **Roxygen2** syntax.
@@ -30,15 +30,14 @@ into [qtl.R](qtl.R).
 
 ### 4. Extracted Hotspot Analysis Functions
 
-I also extracted functions for <file:///Volumes/mkeller3/General/Projects2/R%20scripts/Trans%20eQTL%20hotspot%20analysis%20for%20sex%20and%20diet%20split%20eQTL%20summary%20files.R> into [hotspot.R](hotspot.R).
+I also extracted functions for `Trans eQTL hotspot analysis for sex and diet split eQTL summary files.R` in Research Drive folder `mkeller3/General/Projects2/R scripts` into [hotspot.R](hotspot.R).
 
 - **Functions Extracted**: `load_trans_eqtls`, `calculate_hotspot_density`, `plot_hotspots`, `find_differential_hotspots`, and `plot_differential_hotspots`.
 - **Documentation**: Documented with **Roxygen2** syntax for clear parameter and return value identification.
 
 ### 5. Refactored QTL Analysis Script
 
-I refactored the <file:///Volumes/mkeller3/General/Projects2/R%20scripts/Standalone%20script%20for%20analyzing%20diet%20and%20sex%20specific%20liver%20metabolite%20QTL.R>
-into [qtl_analysis.R](qtl_analysis.R).
+I refactored the `Standalone script for analyzing diet and sex specific liver metabolite QTL.R` in Research Drive folder `mkeller3/General/Projects2/R scripts` into [qtl_analysis.R](qtl_analysis.R).
 
 - **Streamlined**: Removed over 200 lines of redundant function definitions.
 - **Library Integration**: Now sources shared logic from `qtl.R`.
@@ -46,7 +45,7 @@ into [qtl_analysis.R](qtl_analysis.R).
 
 ### 6. Refactored Hotspot Analysis Script
 
-I also refactored the <file:///Volumes/mkeller3/General/Projects2/R%20scripts/Trans%20eQTL%20hotspot%20analysis%20for%20sex%20and%20diet%20split%20eQTL%20summary%20files.R> into [hotspot_analysis.R](hotspot_analysis.R).
+I also refactored the `Trans eQTL hotspot analysis for sex and diet split eQTL summary files.R` in Research Drive folder `mkeller3/General/Projects2/R scripts` into [hotspot_analysis.R](hotspot_analysis.R).
 
 - **Consolidated**: Moved all loading, density, and plotting functions to `hotspot.R`.
 - **Logic Intact**: The script remains fully functional for both Diet and Sex hotspot comparisons and differential trait extraction.

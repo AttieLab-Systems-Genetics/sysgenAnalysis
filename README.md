@@ -35,3 +35,6 @@ quarto render $(Rscript -e 'cat(system.file("scripts", "hotspot_analysis.qmd", p
 ## Code Development
 
 Check out the [Walkthrough](inst/doc/walkthrough.md) for a summary of recent work and package structure.
+See
+[Artificial Intelligence (AI) References](https://github.com/byandell/Documentation/blob/main/AI.md)
+for helpful references.

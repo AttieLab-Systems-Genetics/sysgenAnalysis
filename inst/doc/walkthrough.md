@@ -27,7 +27,10 @@
 
 ## Preamble
 
-The analysis scripts used in this project are located on the Research Drive at `mkeller3/General/Projects2/R scripts`. This project focuses on two primary pipelines, referred to as `[basename]_pipeline`:
+The analysis scripts used in this project are located on the Research Drive at `mkeller3/General/Projects2/R scripts`.
+For a list of pipelines, see `README.md` in that folder.
+
+This project focuses on two primary pipelines, referred to as `[basename]_pipeline`:
 
 - `qtl_pipeline` (based on `Standalone script for analyzing diet and sex specific liver metabolite QTL.R`)
 - `hotspot_pipeline` (based on `Trans eQTL hotspot analysis for sex and diet split eQTL summary files.R`)

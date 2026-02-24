@@ -1,25 +1,31 @@
 # Workflow Walkthrough
 
-## Script Transformation Prompt
+## Workflow Prompt
 
-**Goal**: Refactor a workflow into a modular R package structure.
+**Goal**: Refactor a [workflow] into a modular R package structure.
 
 **Instructions**:
 
-1. **Extract Functions**: Move all logical units (data processing, analysis, plotting) into `R/[basename].R`.
+0. **Set the [workflow] and [basename] variables from user input**:
+    - [workflow]: The name of the workflow to refactor .
+    - [basename]: The `basename` of the workflow to refactor.
+
+1. **Understand the workflow**: Read the [workflow] and understand what it does.
+
+2. **Extract Functions**: Move all logical units (data processing, analysis, plotting) into `R/[basename].R`.
     - Document each function with **Roxygen2** syntax (including `@param`, `@return`, and `@export`).
     - Use R native pipes (`|>`) and explicit namespace calls (e.g., `dplyr::mutate`).
     - Centralize shared constants (like coordinate maps) if not already in `common.R`.
 
-2. **Create Entry Script**: Create an execution script `inst/scripts/[basename]_analysis.R`.
+3. **Create Entry Script**: Create an execution script `inst/scripts/[basename]_analysis.R`.
     - Use it as a clean entry point that calls the functions defined in `R/`.
     - Handle environment setup, file paths, and high-level execution flow here.
 
-3. **Return S3 Objects**: Refactor the main "run" function to return an S3 object of class `[basename]_analysis`.
+4. **Return S3 Objects**: Refactor the main "run" function to return an S3 object of class `[basename]_analysis`.
     - Implement `print`, `summary`, and `plot` methods in `R/[basename].R`.
     - Move file-saving logic (`write.csv`, `ggsave`) out of the functions and into the entry script.
 
-4. **Verify Quarto Integration**: Run the quarto report to make sure it works, correcting any issues that arise.
+5. **Verify Quarto Integration**: Run the quarto report to make sure it works, correcting any issues that arise.
 
 **Requested Files**:
 
@@ -37,16 +43,18 @@ This project focuses on two primary workflows, referred to as `[basename]_workfl
 
 - `qtl_workflow` (based on `Standalone script for analyzing diet and sex specific liver metabolite QTL.R`)
 - `hotspot_workflow` (based on `Trans eQTL hotspot analysis for sex and diet split eQTL summary files.R`)
+- `conserve_workflow` (based on `prioritize_snps.R`)
 
-Subsequent sections in this walkthrough will detail the refactoring steps using the `qtl` basename (or generic `[basename]`) as the primary example.
+Subsequent sections in this walkthrough will detail the refactoring steps using the `qtl` or `conserve` basename (or generic `[basename]`) as the primary example.
 
-## Project Walkthroughs
+## Workflow Walkthroughs
 
 - [2026-02-11: QTL Analysis Workflow Refactoring](#2026-02-11-qtl-analysis-workflow-refactoring)
 - [2026-02-16: R Package Conversion and Refactoring](#2026-02-16-r-package-conversion-and-refactoring)
 - [2026-02-18: S3 Class Refactoring for QTL and Hotspot Analysis](#2026-02-18-s3-class-refactoring-for-qtl-and-hotspot-analysis)
 - [2026-02-18: Interactive Quarto Reports](#2026-02-18-interactive-quarto-reports)
 - [2026-02-18: Bug Fixes and Automation Improvements](#2026-02-18-bug-fixes-and-automation-improvements)
+- [2026-02-24: SNP Conservation Workflow Refactoring](#2026-02-24-snp-conservation-workflow-refactoring)
 
 ## 2026-02-11: QTL Analysis Workflow Refactoring
 
@@ -187,4 +195,35 @@ library(sysgenAnalysis)
 
 ### 5. Verified Analysis Workflow
 
-Successfully ran and verified the outputs for `qtl_analysis.R` following the fixes.
+## 2026-02-24: SNP Conservation Workflow Refactoring
+
+Today's work focused on refactoring the SNP conservation and prioritization workflow into a modular, package-compliant structure.
+
+### 1. Extracted Modular Functions
+
+I refactored `prioritize_snps.R` into `R/conserve.R`, extracting the logic into reusable units.
+
+- **`run_trait_conservation()`**: Handles the heavy lifting of querying conservation scores and calculating priority for a single trait.
+- **`run_conserve_analysis()`**: The global entry point that manages multi-trait analysis and hotspot identification.
+
+### 2. S3 Class Integration
+
+Implemented the `conserve_analysis` S3 class to separate analysis from visualization and persistence.
+
+- **Methods**: Added `print`, `summary`, and `plot` methods.
+- **Flexibility**: The `plot` method can generate both global hotspot Manhattan plots and trait-specific conservation plots.
+
+### 3. Streamlined Scripts and Reporting
+
+Created dedicated entry points that leverage the package core.
+
+- **`conserve_analysis.R`**: A clean script for batch processing and data saving.
+- **`conserve_analysis.qmd`**: A Quarto report that provides an interactive summary of the analysis, including tabbed Manhattan plots for all traits.
+
+### 4. Cross-Platform Path Handling
+
+Integrated the `research_dir()` helper to ensure that the workflow works seamlessly across Mac and Windows environments without manual path editing.
+
+### 5. Verified Workflow
+
+Successfully verified the syntax of the new components and confirmed they align with the package's design patterns.

@@ -15,4 +15,8 @@ Imports:
     dplyr,
     tidyr,
     tibble,
-    rlang
+    rlang,
+    GenomicRanges,
+    GenomicScores,
+    GenomeInfoDb,
+    phastCons35way.UCSC.mm39

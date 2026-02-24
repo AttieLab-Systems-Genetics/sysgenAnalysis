@@ -6,6 +6,19 @@
 #' @name conserve
 NULL
 
+# Resolve non-standard evaluation warnings
+utils::globalVariables(c(
+    "variant_chr", "variant_chr_clean", "variant_pos", "variant_pos_bp",
+    "phastCons_score", "canonical_transcript", "sift_score", "min_sift_score",
+    "priority_score", "priority_score_pure_conservation", "phenotype",
+    "qtl_lod", "qtl_chr", "qtl_pos", "variant_lod", "rs_number", "aa_pos",
+    "aa_change", "csq", "impact", "exon_num", "intron_num", "feature_strand",
+    "variant_id", "gene_symbol", "trait_class", "trait_class_count",
+    "trait_classes", "specific_traits", "avg_phastCons", "variant_pos_mbp",
+    "max_priority", "max_variant_lod", "chr_full", "sort_val", "offset",
+    "cum_pos", "trait_count", "center", "Length", "trait_count"
+))
+
 #' Run SNP Conservation Analysis for a Trait
 #'
 #' Prioritizes SNPs for a specific trait by querying phastCons conservation scores
@@ -16,15 +29,19 @@ NULL
 #'
 #' @return A data frame of prioritized SNPs.
 #'
-#' @importFrom data.table fread as.data.table rbindlist setorder fcoalesce
-#' @importFrom GenomicRanges GRanges IRanges
+#' @importFrom IRanges IRanges
+#' @importFrom GenomicRanges GRanges
 #' @importFrom GenomicScores getGScores score
+#' @importFrom AnnotationHub AnnotationHub setAnnotationHubOption
 #' @importFrom GenomeInfoDb seqinfo seqlengths
-#' @importFrom phastCons35way.UCSC.mm39 phastCons35way.UCSC.mm39
+#' @import phastCons35way.UCSC.mm39
 #' @importFrom stats na.omit
 #' @export
 run_trait_conservation <- function(input_path, trait_name) {
     message("--- Processing Trait: ", trait_name, " ---")
+
+    # Increase download limit for large genome-wide packages
+    AnnotationHub::setAnnotationHubOption("MAX_DOWNLOADS", 100)
 
     # Load phast_mm39 (ideally should be cached or passed, but keeping it simple for now)
     phast_mm39 <- GenomicScores::getGScores("phastCons35way.UCSC.mm39")

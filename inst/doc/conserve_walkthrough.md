@@ -4,7 +4,9 @@ I have successfully refactored the SNP conservation and prioritization workflow 
 
 ## Original Prompt
 
-Use `walkthrough.md#workflow-prompt` for workflow = "/Volumes/General/Projects2/Antigravity/SNP_conservation/prioritize_snps.R" and basename = "conserve".
+Use
+[walkthrough.md#workflow-prompt](walkthrough.md#workflow-prompt)
+for workflow = "/Volumes/General/Projects2/Antigravity/SNP_conservation/prioritize_snps.R" and basename = "conserve".
 
 ## Changes Made
 

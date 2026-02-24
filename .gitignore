@@ -47,4 +47,13 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+# Script output files
 byandell/*
+*.html
+*.png
+*.js
+*.css
+*.woff
+.DS_Store
+*.pdf
+*.zip

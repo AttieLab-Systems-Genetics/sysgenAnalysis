@@ -8,6 +8,8 @@ Use
 [walkthrough.md#workflow-prompt](walkthrough.md#workflow-prompt)
 for workflow = "/Volumes/General/Projects2/Antigravity/SNP_conservation/prioritize_snps.R" and basename = "conserve".
 
+NB: The workflow as provided included analsys of 6 different `traits_to_process` files. Before running the workflow (see end of this document), it is important to modify the script to either use only one file (say "Liver_Lipids") or have the `traits_to_process` variable be subset to only the traits you want to process.
+
 ## Changes Made
 
 ### Core Logic

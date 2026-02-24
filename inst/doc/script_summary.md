@@ -1,6 +1,6 @@
 # script_summary.md: Summary of Specialized R Scripts
 
-This document provides a summary of the specialized R scripts found in `Scripts/Edited scripts/`. These scripts extend the core QTL analysis pipeline to address specific biological questions and automate common tasks in the local Mac environment.
+This document provides a summary of the specialized R scripts found in `Scripts/Edited scripts/`. These scripts extend the core QTL analysis workflow to address specific biological questions and automate common tasks in the local Mac environment.
 
 ## 1. Local Environment & Automation
 
@@ -15,7 +15,7 @@ This document provides a summary of the specialized R scripts found in `Scripts/
 
 ## 3. Mitochondrial Gene Analysis
 
-- **[mito_gene_additive_isoform_eqtl.R](../Scripts/Edited%20scripts/mito_gene_additive_isoform_eqtl.R)**: Pipelines for eQTL mapping of target mitochondrial genes (e.g., *Mcat*, *Oxsm*, *Mecr*). Generates Manhattan plots highlighting cis and trans effect peaks.
+- **[mito_gene_additive_isoform_eqtl.R](../Scripts/Edited%20scripts/mito_gene_additive_isoform_eqtl.R)**: Workflows for eQTL mapping of target mitochondrial genes (e.g., *Mcat*, *Oxsm*, *Mecr*). Generates Manhattan plots highlighting cis and trans effect peaks.
 - **[mito_gene_diet_interactive_isoform_eqtl.R](../Scripts/Edited%20scripts/mito_gene_diet_interactive_isoform_eqtl.R)**: Similar to the additive script but focuses on identifying eQTLs that interact with diet (HC vs HF).
 - **[mito_gene_heat plot.R](../Scripts/Edited%20scripts/mito_gene_heat%20plot.R)**: Visualization tool to create heatmaps for mitochondrial gene expression or QTL results.
 - **[mito_lipid_genes_heat_plot_vs_strain_effects.R](../Scripts/Edited%20scripts/mito_lipid_genes_heat_plot_vs_strain_effects.R)**: Visualizes the effects of different founder strains (A-H) on lipid-related mitochondrial genes.
@@ -33,8 +33,8 @@ This document provides a summary of the specialized R scripts found in `Scripts/
 
 The scripts summarized above in `Scripts/Edited scripts/` represent specialized biological investigations and the evolutionary development of the project. They relate to the primary analysis scripts in the `byandell/` directory as follows:
 
-1. **Refinement vs. Exploration**: The scripts in `byandell/` ([qtl_analysis.R](qtl_analysis.R), [hotspot_analysis.R](hotspot_analysis.R)) are the refined, project-wide pipelines. They utilize the standardized environment defined in [dir.R](dir.R) and [common.R](common.R). In contrast, the scripts in `Edited scripts/` are exploratory "deep dives" into specific genes (e.g., *Pdp2*, *Slc7a7*) or regions (e.g., Chromosome 15).
-2. **Modularity**: The core logic from `Edited scripts/` has been modularized into shared libraries. These functions are now used to drive the production pipelines:
+1. **Refinement vs. Exploration**: The scripts in `byandell/` ([qtl_analysis.R](qtl_analysis.R), [hotspot_analysis.R](hotspot_analysis.R)) are the refined, project-wide workflows. They utilize the standardized environment defined in [dir.R](dir.R) and [common.R](common.R). In contrast, the scripts in `Edited scripts/` are exploratory "deep dives" into specific genes (e.g., *Pdp2*, *Slc7a7*) or regions (e.g., Chromosome 15).
+2. **Modularity**: The core logic from `Edited scripts/` has been modularized into shared libraries. These functions are now used to drive the production workflows:
     - **[qtl.R](qtl.R)**: Formalizes logic from `Mac_QTL_Analysis_Function.R` and `Analysis_Pipeline_QTL_Multiple traits.R`.
         - `get_specificity()`: Standardizes the "Shared" vs "Specific" comparison logic.
         - `generate_clean_manhattan()`: Provides the GRCm39-sanitized plotting logic.

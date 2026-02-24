@@ -1,6 +1,7 @@
-# Initial Pipeline Summary
+# Initial Workflow Summary
 
-This document summarizes the core analytical infrastructure defined in `Scripts/README.md`, following the patterns established in the Diversity Outbred (DO) workflow. Most of `README.md` is in the [standalone QTL script](../Scripts/Unedited%20scripts/Standalone%20script%20for%20analyzing%20diet%20and%20sex%20specific%20liver%20metabolite%20QTL.R). The standalone script is the better reference for the core pipeline logic, but README.md contains the specific Mac-friendly paths and the extra Glutarylcarnitine analysis you were working on previously.
+This document summarizes the core analytical infrastructure defined
+in Alan Attie's `R_stuff` box folder `Scripts/README.md`, following the patterns established in the Diversity Outbred (DO) workflow. Most of `README.md` is in the [standalone QTL script](../Scripts/Unedited%20scripts/Standalone%20script%20for%20analyzing%20diet%20and%20sex%20specific%20liver%20metabolite%20QTL.R). The standalone script is the better reference for the core workflow logic, but README.md contains the specific Mac-friendly paths and the extra Glutarylcarnitine analysis you were working on previously.
 
 ## Core Analysis Modules
 

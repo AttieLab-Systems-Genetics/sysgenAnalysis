@@ -1,8 +1,8 @@
-# Pipeline Walkthrough
+# Workflow Walkthrough
 
 ## Script Transformation Prompt
 
-**Goal**: Refactor a pipeline into a modular R package structure.
+**Goal**: Refactor a workflow into a modular R package structure.
 
 **Instructions**:
 
@@ -28,37 +28,38 @@
 ## Preamble
 
 The analysis scripts used in this project are located on the Research Drive at `mkeller3/General/Projects2/R scripts`.
-For a list of pipelines, see `README.md` in that folder.
+For a list of workflows, see `README.md` in that folder
+(local copy is [README_Projects2.md](README_Projects2.md)).
 
-This project focuses on two primary pipelines, referred to as `[basename]_pipeline`:
+This project focuses on two primary workflows, referred to as `[basename]_workflow`:
 
-- `qtl_pipeline` (based on `Standalone script for analyzing diet and sex specific liver metabolite QTL.R`)
-- `hotspot_pipeline` (based on `Trans eQTL hotspot analysis for sex and diet split eQTL summary files.R`)
+- `qtl_workflow` (based on `Standalone script for analyzing diet and sex specific liver metabolite QTL.R`)
+- `hotspot_workflow` (based on `Trans eQTL hotspot analysis for sex and diet split eQTL summary files.R`)
 
 Subsequent sections in this walkthrough will detail the refactoring steps using the `qtl` basename (or generic `[basename]`) as the primary example.
 
 ## Project Walkthroughs
 
-- [2026-02-11: QTL Analysis Pipeline Refactoring](#2026-02-11-qtl-analysis-pipeline-refactoring)
+- [2026-02-11: QTL Analysis Workflow Refactoring](#2026-02-11-qtl-analysis-workflow-refactoring)
 - [2026-02-16: R Package Conversion and Refactoring](#2026-02-16-r-package-conversion-and-refactoring)
 - [2026-02-18: S3 Class Refactoring for QTL and Hotspot Analysis](#2026-02-18-s3-class-refactoring-for-qtl-and-hotspot-analysis)
 - [2026-02-18: Interactive Quarto Reports](#2026-02-18-interactive-quarto-reports)
 - [2026-02-18: Bug Fixes and Automation Improvements](#2026-02-18-bug-fixes-and-automation-improvements)
 
-## 2026-02-11: QTL Analysis Pipeline Refactoring
+## 2026-02-11: QTL Analysis Workflow Refactoring
 
 Today's work focused on summarizing, extracting, and refactoring the core analysis infrastructure for the Diversity Outbred (DO) project.
 
-### 1. Created Initial Pipeline Summary
+### 1. Created Initial Workflow Summary
 
-I created a new file [initial_pipeline.md](initial_pipeline.md) which provides a concise overview of the five functional modules found in the main `README.md`.
+I created a new file [initial_workflow.md](initial_workflow.md) which provides a concise overview of the five functional modules found in the main `README.md`.
 
 ### 2. Verified Context
 
 I used the existing `Context review DO eQTL and correlation analysis.md`
 in Box folder `R_stuff/Workflow summaries` as a guide to ensure consistency in terminology and scope.
 
-### 3. Extracted Pipeline Functions
+### 3. Extracted Workflow Functions
 
 I extracted core functions from the Research Drive folder into `R/[basename].R` (e.g., [qtl.R](qtl.R)).
 
@@ -112,7 +113,7 @@ Today's work focused on fully converting the `sysgenAnalysis` directory into a f
 - **Explicit Imports**: Updated all functions to use specific `@importFrom` tags, improving namespace clarity and avoiding conflicts.
 - **Directory Management**: Implemented a cross-platform `research_dir()` function in `common.R` to handle Mac (`/Volumes`) and PC (`W:`) paths automatically.
 
-### 3. Analysis Pipeline Encapsulation
+### 3. Analysis Workflow Encapsulation
 
 - **QTL Analysis**: Created `run_qtl_analysis()` to encapsulate the entire specificity and hotspot logic.
 - **Streamlined Scripts**: Refactored `qtl_analysis.R` into a concise entry point that leverages these new functions.
@@ -126,7 +127,7 @@ Today's work focused on fully converting the `sysgenAnalysis` directory into a f
 
 ## 2026-02-18: S3 Class Refactoring for QTL and Hotspot Analysis
 
-Today's work refactored both the QTL and Hotspot analysis pipelines to use a more idiomatic R approach with S3 classes. This change separates the heavy lifting of the analysis from data persistence, providing more flexibility and better organization.
+Today's work refactored both the QTL and Hotspot analysis workflows to use a more idiomatic R approach with S3 classes. This change separates the heavy lifting of the analysis from data persistence, providing more flexibility and better organization.
 
 ### 1. S3 Class Refactor
 
@@ -182,6 +183,6 @@ library(sysgenAnalysis)
 - **README**: Updated with robust instructions for sourcing scripts from an installed package using `system.file()`.
 - **Walkthrough**: Updated workflow references to use descriptive location text for Research Drive and Box files.
 
-### 5. Verified Analysis Pipeline
+### 5. Verified Analysis Workflow
 
 Successfully ran and verified the outputs for `qtl_analysis.R` following the fixes.

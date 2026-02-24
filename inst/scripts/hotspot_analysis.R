@@ -1,5 +1,5 @@
 # ==========================================
-# Trans-eQTL Hotspot Analysis Pipeline
+# Trans-eQTL Hotspot Analysis Workflow
 # ==========================================
 
 # 1. Setup Environment

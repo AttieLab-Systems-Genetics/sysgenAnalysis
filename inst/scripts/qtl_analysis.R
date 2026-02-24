@@ -1,5 +1,5 @@
 # ===============================================================
-# QTL Analysis Pipeline: Specificity & Hotspots
+# QTL Analysis Workflow: Specificity & Hotspots
 # ===============================================================
 
 # 1. Setup Environment

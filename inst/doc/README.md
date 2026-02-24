@@ -1,6 +1,6 @@
 # byandell Analysis Folder
 
-This folder contains documentation for pipeline transformations.
+This folder contains documentation for workflow transformations.
 It has ideas on how to organize scripts and results in a way that
 is easy to revisit and expand over time.
 
@@ -19,6 +19,6 @@ See [sysgenAnalysis](https://github.com/AttieLab-Systems-Genetics/sysgenAnalysis
 
 Refer to these documents for more information:
 
-- [initial_pipeline.md](initial_pipeline.md): Original pipeline description.
+- [initial_workflow.md](initial_workflow.md): Original workflow description.
 - [setup.md](setup.md): Setup instructions.
 - [walkthrough.md](walkthrough.md): Documented walkthrough of the analysis process.

@@ -25,7 +25,10 @@
     - Implement `print`, `summary`, and `plot` methods in `R/[basename].R`.
     - Move file-saving logic (`write.csv`, `ggsave`) out of the functions and into the entry script.
 
-5. **Verify Quarto Integration**: Run the quarto report to make sure it works, correcting any issues that arise.
+5. **Verify Integration**: Check package and scripts, correcting any issues that arise.
+    - Verify documents with `devtools::document()`.
+    - Build the package.
+    - Run the quarto report to make sure it works.
 
 **Requested Files**:
 

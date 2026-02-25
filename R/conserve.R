@@ -119,7 +119,8 @@ run_trait_conservation <- function(input_path, trait_name) {
 
     # Scores
     snps_long[, priority_score := data.table::fcoalesce(phastCons_score, 0) - data.table::fcoalesce(min_sift_score, 1.0)]
-    snps_long[, priority_score_pure_conservation := data.table::fcoalesce(phastCons_score, 0)]
+    # Handle cases where min_sift_score might be Inf (introduced by aggregation later or if already present)
+    snps_long[is.infinite(priority_score), priority_score := data.table::fcoalesce(phastCons_score, 0) - 1.0]
 
     # Collapse to SNP/Gene
     pick_best <- function(values, is_canonical) {
@@ -152,7 +153,13 @@ run_trait_conservation <- function(input_path, trait_name) {
         intron_num = paste0("'", pick_best(intron_num, canonical_transcript)),
         feature_strand = pick_best(feature_strand, canonical_transcript),
         phastCons_score = phastCons_score[1],
-        min_sift_score = min(min_sift_score, na.rm = TRUE),
+        min_sift_score = (function(val) {
+            m <- min(val, na.rm = TRUE)
+            if (is.infinite(m)) {
+                return(-1)
+            }
+            return(m)
+        })(min_sift_score),
         priority_score = priority_score[1],
         priority_score_pure_conservation = priority_score_pure_conservation[1]
     ), by = .(variant_id, gene_symbol)]

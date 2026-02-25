@@ -19,6 +19,7 @@ NB: The workflow as provided included analsys of 6 different `traits_to_process`
 - **Functions**: Extracted logic into `run_trait_conservation()` and `run_conserve_analysis()`.
 - **S3 Methods**: Implemented `print`, `summary`, and `plot` for the `conserve_analysis` class.
 - **Improved Cohesion**: Centralized genome build (mm39) and coordinate management.
+- **Robustness**: Updated to treat `Inf` SIFT scores as `-1`, ensuring finite `priority_score` results when scores are missing.
 
 ### Analysis Scripts
 

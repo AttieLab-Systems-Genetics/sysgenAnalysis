@@ -122,6 +122,8 @@ run_trait_conservation <- function(input_path, trait_name) {
     # Handle cases where min_sift_score might be Inf (introduced by aggregation later or if already present)
     snps_long[is.infinite(priority_score), priority_score := data.table::fcoalesce(phastCons_score, 0) - 1.0]
 
+    snps_long[, priority_score_pure_conservation := data.table::fcoalesce(phastCons_score, 0)]
+
     # Collapse to SNP/Gene
     pick_best <- function(values, is_canonical) {
         if (any(is_canonical == 1, na.rm = TRUE)) {

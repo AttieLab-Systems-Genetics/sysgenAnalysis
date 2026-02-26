@@ -23,12 +23,12 @@ NB: The workflow as provided included analsys of 6 different `traits_to_process`
 
 ### Analysis Scripts
 
-#### [NEW] [conserve_analysis.R](../scripts/conserve_analysis.R)
+#### [NEW] [analyze_conserve.R](../scripts/analyze_conserve.R)
 
 - Clean entry point for batch processing all trait classes.
 - Automatically handles directory creation and file saving on the Research Drive.
 
-#### [NEW] [conserve_analysis.qmd](../scripts/conserve_analysis.qmd)
+#### [NEW] [explore_conserve.qmd](../scripts/explore_conserve.qmd)
 
 - Interactive Quarto report featuring:
   - Tabbed Manhattan plots for each trait.
@@ -52,11 +52,11 @@ NB: The workflow as provided included analsys of 6 different `traits_to_process`
 ### Via R Script
 
 ```r
-source(system.file("scripts", "conserve_analysis.R", package = "sysgenAnalysis"))
+source(system.file("scripts", "analyze_conserve.R", package = "sysgenAnalysis"))
 ```
 
 ### Via Quarto
 
 ```bash
-quarto render $(Rscript -e 'cat(system.file("scripts", "conserve_analysis.qmd", package = "sysgenAnalysis"))')
+quarto render $(Rscript -e 'cat(system.file("scripts", "explore_conserve.qmd", package = "sysgenAnalysis"))')
 ```

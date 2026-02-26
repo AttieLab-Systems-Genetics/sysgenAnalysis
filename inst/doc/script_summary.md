@@ -33,7 +33,7 @@ This document provides a summary of the specialized R scripts found in `Scripts/
 
 The scripts summarized above in `Scripts/Edited scripts/` represent specialized biological investigations and the evolutionary development of the project. They relate to the primary analysis scripts in the `byandell/` directory as follows:
 
-1. **Refinement vs. Exploration**: The scripts in `byandell/` ([qtl_analysis.R](qtl_analysis.R), [hotspot_analysis.R](hotspot_analysis.R)) are the refined, project-wide workflows. They utilize the standardized environment defined in [dir.R](dir.R) and [common.R](common.R). In contrast, the scripts in `Edited scripts/` are exploratory "deep dives" into specific genes (e.g., *Pdp2*, *Slc7a7*) or regions (e.g., Chromosome 15).
+1. **Refinement vs. Exploration**: The scripts in `byandell/` ([analyze_qtl.R](analyze_qtl.R), [analyze_hotspot.R](analyze_hotspot.R)) are the refined, project-wide workflows. They utilize the standardized environment defined in [dir.R](dir.R) and [common.R](common.R). In contrast, the scripts in `Edited scripts/` are exploratory "deep dives" into specific genes (e.g., *Pdp2*, *Slc7a7*) or regions (e.g., Chromosome 15).
 2. **Modularity**: The core logic from `Edited scripts/` has been modularized into shared libraries. These functions are now used to drive the production workflows:
     - **[qtl.R](qtl.R)**: Formalizes logic from `Mac_QTL_Analysis_Function.R` and `Analysis_Pipeline_QTL_Multiple traits.R`.
         - `get_specificity()`: Standardizes the "Shared" vs "Specific" comparison logic.

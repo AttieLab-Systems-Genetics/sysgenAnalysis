@@ -17,16 +17,16 @@ devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
 
 This package follows a two-step workflow for each analysis:
 
-1. **Execution**: Run the `_analysis.R` script locally or on the research drive to process data, identify peaks/hotspots, and save the results as CSV files.
-2. **Exploration**: Render the `_explore.qmd` report to visualize the results. These reports load the saved CSVs (no re-running of analysis) and provide interactive summaries.
+1. **Execution**: Run the `analyze_[basename].R` script locally or on the research drive to process data, identify peaks/hotspots, and save the results as CSV files.
+2. **Exploration**: Render the `explore_[basename].qmd` report to visualize the results. These reports load the saved CSVs (no re-running of analysis) and provide interactive summaries.
 
 ### Available Workflows
 
 | Component | Execution Script | Exploration Report |
 |-----------|------------------|--------------------|
-| **QTL** | [qtl_analysis.R](inst/scripts/qtl_analysis.R) | [qtl_explore.qmd](inst/scripts/qtl_explore.qmd) |
-| **Hotspots** | [hotspot_analysis.R](inst/scripts/hotspot_analysis.R) | [hotspot_explore.qmd](inst/scripts/hotspot_explore.qmd) |
-| **SNP Conservation** | [conserve_analysis.R](inst/scripts/conserve_analysis.R) | [conserve_explore.qmd](inst/scripts/conserve_explore.qmd) |
+| **QTL** | [analyze_qtl.R](inst/scripts/analyze_qtl.R) | [explore_qtl.qmd](inst/scripts/explore_qtl.qmd) |
+| **Hotspots** | [analyze_hotspot.R](inst/scripts/analyze_hotspot.R) | [explore_hotspot.qmd](inst/scripts/explore_hotspot.qmd) |
+| **SNP Conservation** | [analyze_conserve.R](inst/scripts/analyze_conserve.R) | [explore_conserve.qmd](inst/scripts/explore_conserve.qmd) |
 
 ### Usage
 

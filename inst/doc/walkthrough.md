@@ -17,7 +17,7 @@
     - Use R native pipes (`|>`) and explicit namespace calls (e.g., `dplyr::mutate`).
     - Centralize shared constants (like coordinate maps) if not already in `common.R`.
 
-3. **Create Entry Script**: Create an execution script `inst/scripts/[basename]_analysis.R`.
+3. **Create Entry Script**: Create an execution script `inst/scripts/analyze_[basename].R`.
     - Use it as a clean entry point that calls the functions defined in `R/`.
     - Handle environment setup, file paths, and high-level execution flow here.
 
@@ -28,9 +28,9 @@
 5. **Verify Integration**: Check package and scripts, correcting any issues that arise.
     - Verify documents with `devtools::document()`.
     - Build the package.
-    - Run the [basename]_analysis.R script to make sure it works.
+    - Run the analyze_[basename].R script to make sure it works.
 
-6. **Create Exploration Document**: Create a Quarto document `inst/scripts/[basename]_explore.qmd` to explore the results saved by the analysis script.
+6. **Create Exploration Document**: Create a Quarto document `inst/scripts/explore_[basename].qmd` to explore the results saved by the analysis script.
     - Use `sysgenAnalysis::read_[basename]_analysis(output_path)` to reconstruct the S3 object from CSV files.
     - Focus on visualization and interactive summaries using the S3 methods (`print`, `summary`, `plot`).
     - This approach ensures that exploration is fast (no re-running analysis) and transparent (uses human-readable CSVs).
@@ -38,8 +38,8 @@
 **Requested Files**:
 
 - `R/[basename].R`
-- `inst/scripts/[basename]_analysis.R`
-- `inst/scripts/[basename]_explore.qmd`
+- `inst/scripts/analyze_[basename].R`
+- `inst/scripts/explore_[basename].qmd`
 
 ## Preamble
 
@@ -90,7 +90,7 @@ I extracted core functions from the Research Drive folder into `R/[basename].R` 
 
 ### 4. Refactored Analysis Script
 
-I refactored the original scripts from the Research Drive folder into `inst/scripts/[basename]_analysis.R` (e.g., [qtl_analysis.R](qtl_analysis.R)).
+I refactored the original scripts from the Research Drive folder into `inst/scripts/analyze_[basename].R` (e.g., [analyze_qtl.R](analyze_qtl.R)).
 
 - **Streamlined**: Removed over 200 lines of redundant function definitions.
 - **Library Integration**: Now sources shared logic from `R/`.
@@ -109,7 +109,7 @@ I created [common.R](common.R) to house shared infrastructure:
 - Run the analysis scripts:
 
   ```r
-  source("inst/scripts/qtl_analysis.R")
+  source("inst/scripts/analyze_qtl.R")
   ```
 
 - Or source the libraries (always source `common.R` first if loading individually):
@@ -137,7 +137,7 @@ Today's work focused on fully converting the `sysgenAnalysis` directory into a f
 ### 3. Analysis Workflow Encapsulation
 
 - **QTL Analysis**: Created `run_qtl_analysis()` to encapsulate the entire specificity and hotspot logic.
-- **Streamlined Scripts**: Refactored `qtl_analysis.R` into a concise entry point that leverages these new functions.
+- **Streamlined Scripts**: Refactored `analyze_qtl.R` into a concise entry point that leverages these new functions.
 
 ### 4. Code Cleanup
 
@@ -152,10 +152,10 @@ Today's work refactored both the QTL and Hotspot analysis workflows to use a mor
 
 ### 1. S3 Class Refactor
 
-- **S3 Class `qtl_analysis`**: Modified `run_qtl_analysis()` to return an object of class `qtl_analysis`.
-- **Methods**: Implemented `print()`, `summary()`, and `plot()` methods for the `qtl_analysis` class.
-- **Modularity**: Removed internal file saving logic from `run_qtl_analysis()`.
-- **`qtl_analysis.R`**: Updated to capture the `qtl_analysis` object and handle file saving locally.
+- **S3 Class `[basename]_analysis`**: Modified `run_[basename]_analysis()` to return an object of class `[basename]_analysis`.
+- **Methods**: Implemented `print()`, `summary()`, and `plot()` methods for the `[basename]_analysis` class.
+- **Modularity**: Removed internal file saving logic from `run_[basename]_analysis()`.
+- **`analyze_[basename].R`**: Updated to capture the `[basename]_analysis` object and handle file saving locally.
 
 ## 2026-02-18: Interactive Quarto Reports
 
@@ -163,7 +163,7 @@ I've converted the core analysis scripts into Quarto markdown (`.qmd`) documents
 
 ### 1. New Quarto Documents
 
-- **`qtl_explore.qmd`**: A full report for QTL specificity and integrated Manhattan plotting.
+- **`explore_qtl.qmd`**: A full report for QTL specificity and integrated Manhattan plotting.
 
 ### 2. How to Use
 
@@ -171,7 +171,7 @@ You can render these reports to HTML or PDF using the Quarto CLI or RStudio:
 
 ```bash
 # From the terminal
-quarto render inst/scripts/qtl_explore.qmd
+quarto render inst/scripts/explore_qtl.qmd
 ```
 
 Within RStudio, simply open the `.qmd` file and click the **Render** button. These reports display plots inline and include a "Data Persistence" section that is disabled by default (to avoid accidental overwrites) but can be enabled to save the analysis artifacts.
@@ -193,7 +193,7 @@ Fixed a vector length recycling error in `load_trans_eqtls` that caused the hots
 Added logic to all analysis scripts and Quarto documents in `inst/scripts/` to check for `sysgenAnalysis` and automatically install it from GitHub if it's not present. This makes the scripts truly standalone for collaborators.
 
 ```r
-if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
+if (!requireNamespace("sysgenAnalysis", quietly := TRUE)) {
   devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
 }
 library(sysgenAnalysis)
@@ -230,8 +230,8 @@ Implemented the `conserve_analysis` S3 class to separate analysis from visualiza
 
 Created dedicated entry points that leverage the package core.
 
-- **`conserve_analysis.R`**: A clean script for batch processing and data saving.
-- **`conserve_explore.qmd`**: A Quarto report that provides an interactive summary of the analysis, including tabbed Manhattan plots for all traits.
+- **`analyze_conserve.R`**: A clean script for batch processing and data saving.
+- **`explore_conserve.qmd`**: A Quarto report that provides an interactive summary of the analysis, including tabbed Manhattan plots for all traits.
 
 ### 4. Cross-Platform Path Handling
 
@@ -262,14 +262,14 @@ I moved the S3 object reconstruction logic into the package core to promote reus
 
 ### 3. Streamlined Exploration Documents
 
-The `_explore.qmd` documents were refactored to be thin visualization layers. They no longer contain complex data-loading logic; instead, they call the package's `read_*` functions to instantly restore the S3 objects for plotting and summarization using standard S3 methods.
+The `explore_[basename].qmd` documents were refactored to be thin visualization layers. They no longer contain complex data-loading logic; instead, they call the package's `read_[basename]_analysis` functions to instantly restore the S3 objects for plotting and summarization using standard S3 methods.
 
 ### 4. Simplified Workflow Helpers
 
 I added two high-level helpers to `R/common.R` to streamline the user experience:
 
 - **`run_analysis(basename)`**: Executes the full analysis pipeline (QTL, Hotspots, or SNPs) and saves the CSV results.
-- **`render_explore(basename)`**: Automates Quarto rendering to generate a project-relative HTML report.
+- **`render_explore(basename, output_dir)`**: Automates Quarto rendering to generate a project-relative HTML report.
 
 ```r
 # New standard workflow

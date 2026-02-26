@@ -109,7 +109,7 @@ clean_chr_factor <- function(chr_vector) {
 #' @export
 render_explore <- function(basename, output_dir = getwd()) {
   # 1. Resolve path to the .qmd file
-  qmd_file <- system.file("scripts", paste0(basename, "_explore.qmd"), package = "sysgenAnalysis")
+  qmd_file <- system.file("scripts", paste0("explore_", basename, ".qmd"), package = "sysgenAnalysis")
 
   if (qmd_file == "") {
     stop(paste0("Exploration document not found for basename: ", basename))
@@ -122,7 +122,7 @@ render_explore <- function(basename, output_dir = getwd()) {
 
   quarto::quarto_render(
     input = qmd_file,
-    output_file = paste0(basename, "_explore.html"),
+    output_file = paste0("explore_", basename, ".html"),
     execute_dir = getwd(),
     quarto_args = c("--output-dir", output_dir)
   )
@@ -138,7 +138,7 @@ render_explore <- function(basename, output_dir = getwd()) {
 #' @export
 run_analysis <- function(basename, ...) {
   # 1. Resolve path to the .R file
-  r_file <- system.file("scripts", paste0(basename, "_analysis.R"), package = "sysgenAnalysis")
+  r_file <- system.file("scripts", paste0("analyze_", basename, ".R"), package = "sysgenAnalysis")
 
   if (r_file == "") {
     stop(paste0("Analysis script not found for basename: ", basename))

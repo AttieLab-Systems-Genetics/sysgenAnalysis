@@ -63,4 +63,12 @@ if (!is.null(p)) {
   ggplot2::ggsave(file.path(hotspot_dir, fname), p, width = 16, height = 8, dpi = 600)
 }
 
+# Save Objects for Exploration
+if (!is.null(qtl_res$plot_data)) {
+  write.csv(qtl_res$plot_data, file.path(output_path, "QTL_Plot_Data.csv"), row.names = FALSE)
+}
+if (!is.null(qtl_res$top_10_hs)) {
+  write.csv(qtl_res$top_10_hs, file.path(output_path, "QTL_Top_10_Hotspots.csv"), row.names = FALSE)
+}
+
 message("Results saved to: ", output_path)

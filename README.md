@@ -13,23 +13,39 @@ You can install the development version of `sysgenAnalysis` from [GitHub](https:
 devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
 ```
 
-## Scripts
+## Workflows & Scripts
 
-See the [QTL Analysis](inst/scripts/qtl_analysis.qmd) and [Hotspot Analysis](inst/scripts/hotspot_analysis.qmd) scripts for examples of how to use the package.
-There are R code versions in inst/scripts/ as well.
+This package follows a two-step workflow for each analysis:
 
-If the package is installed, you can source the R scripts directly:
+1. **Execution**: Run the `_analysis.R` script locally or on the research drive to process data, identify peaks/hotspots, and save the results as CSV files.
+2. **Exploration**: Render the `_explore.qmd` report to visualize the results. These reports load the saved CSVs (no re-running of analysis) and provide interactive summaries.
+
+### Available Workflows
+
+| Component | Execution Script | Exploration Report |
+|-----------|------------------|--------------------|
+| **QTL** | [qtl_analysis.R](inst/scripts/qtl_analysis.R) | [qtl_explore.qmd](inst/scripts/qtl_explore.qmd) |
+| **Hotspots** | [hotspot_analysis.R](inst/scripts/hotspot_analysis.R) | [hotspot_explore.qmd](inst/scripts/hotspot_explore.qmd) |
+| **SNP Conservation** | [conserve_analysis.R](inst/scripts/conserve_analysis.R) | [conserve_explore.qmd](inst/scripts/conserve_explore.qmd) |
+
+### Usage
+
+If the package is installed, you can execute analysis workflows directly from the R console:
 
 ```r
-source(system.file("scripts", "qtl_analysis.R", package = "sysgenAnalysis"))
-source(system.file("scripts", "hotspot_analysis.R", package = "sysgenAnalysis"))
+library(sysgenAnalysis)
+
+# Run the full analysis (saves CSVs for exploration)
+sysgenAnalysis::run_analysis("qtl")
+sysgenAnalysis::run_analysis("hotspot")
 ```
 
-You can also render the Quarto reports to HTML:
+To render exploration reports, use the package helper:
 
-```bash
-quarto render $(Rscript -e 'cat(system.file("scripts", "qtl_analysis.qmd", package = "sysgenAnalysis"))')
-quarto render $(Rscript -e 'cat(system.file("scripts", "hotspot_analysis.qmd", package = "sysgenAnalysis"))')
+```r
+# This will save the HTML in your current folder
+sysgenAnalysis::render_explore("qtl", output_dir = ".")
+sysgenAnalysis::render_explore("hotspot", output_dir = ".")
 ```
 
 ## Code Development

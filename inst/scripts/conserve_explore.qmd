@@ -1,0 +1,71 @@
+---
+title: "SNP Conservation: Exploration"
+subtitle: "Prioritizing SNPs using GenomicScores and SIFT"
+author: "sysgenAnalysis"
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
+  devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
+}
+library(sysgenAnalysis)
+library(ggplot2)
+library(data.table)
+```
+
+## Configuration
+
+```{r config}
+# NOTE: If rendering from the package library, use 'quarto render ... --execute-dir .'
+# to ensure relative paths below resolve to your project directory.
+base_research_dir <- research_dir()
+base_out <- file.path(dirname(base_research_dir), "Projects2/Antigravity/SNP_conservation")
+```
+
+## Load Results from CSVs
+
+```{r load-results}
+results <- sysgenAnalysis::read_conserve_analysis(base_out)
+```
+
+## Results Summary
+
+### Overall Statistics
+
+```{r summary}
+summary(results)
+```
+
+### Global Hotspots
+
+Top variants found across multiple trait classes.
+
+```{r hotspots-table}
+knitr::kable(head(results$hotspots[, .(variant_id, gene_symbol, trait_class_count, trait_classes, max_priority)], 20))
+```
+
+## Visualizations
+
+### Global Hotspot Manhattan Plot
+
+```{r plot-global, fig.width=14, fig.height=6}
+plot(results)
+```
+
+### Trait-Specific Manhattan Plots {.tabset}
+
+```{r plot-traits, results='asis', fig.width=14, fig.height=6}
+for (t_name in names(results$all_results)) {
+  cat("\n#### ", t_name, "\n")
+  p <- plot(results, trait_name = t_name)
+  print(p)
+  cat("\n")
+}
+```

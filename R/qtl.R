@@ -400,3 +400,36 @@ plot.qtl_analysis <- function(x, ...) {
 
   return(p)
 }
+
+#' Read QTL Analysis Results from CSV
+#'
+#' Reconstructs a `qtl_analysis` object from saved CSV files.
+#'
+#' @param output_path Path to the directory containing the saved QTL analysis CSVs.
+#'
+#' @return An object of class `qtl_analysis`.
+#'
+#' @importFrom data.table fread
+#' @export
+read_qtl_analysis <- function(output_path) {
+  # 1. Load Data Frames
+  summary_table <- data.table::fread(file.path(output_path, "QTL_Specificity_Summary_Table.csv"))
+  final_hs <- data.table::fread(file.path(output_path, "Hotspot_Analysis/Global_Hotspot_Summary_Ranked.csv"))
+  plot_data <- data.table::fread(file.path(output_path, "QTL_Plot_Data.csv"))
+  top_10_hs <- data.table::fread(file.path(output_path, "QTL_Top_10_Hotspots.csv"))
+
+  # 2. Reconstruct S3 Object
+  # Note: Some params might be lost if not saved to CSV, using defaults or inferred values
+  res <- list(
+    summary_table = summary_table,
+    final_hs = final_hs,
+    plot_data = plot_data,
+    top_10_hs = top_10_hs,
+    params = list(
+      rank_by = "Diversity", # Default or inferred
+      phenotype_classes = c("liver_metabolites_labeled", "plasma_metabolites", "liver_lipids", "clinical_traits")
+    )
+  )
+  class(res) <- "qtl_analysis"
+  return(res)
+}

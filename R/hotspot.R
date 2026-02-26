@@ -387,3 +387,65 @@ plot.hotspot_analysis <- function(x, ...) {
   }
   return(plots)
 }
+
+#' Read Hotspot Analysis Results from CSV
+#'
+#' Reconstructs a `hotspot_analysis` object from saved CSV files.
+#'
+#' @param output_path Path to the directory containing the saved hotspot analysis CSVs.
+#'
+#' @return An object of class `hotspot_analysis`.
+#'
+#' @importFrom data.table fread
+#' @importFrom dplyr filter
+#' @export
+read_hotspot_analysis <- function(output_path) {
+  # 1. Identify Trait Classes and Categories from files
+  all_files <- list.files(output_path, pattern = "_density.csv$")
+  trait_classes <- unique(gsub("_(diet|sex)_density.csv$", "", all_files))
+
+  all_results <- list()
+
+  for (t_class in trait_classes) {
+    class_res <- list()
+
+    # Load Diet
+    diet_file <- file.path(output_path, paste0(t_class, "_diet_density.csv"))
+    if (file.exists(diet_file)) {
+      density <- data.table::fread(diet_file)
+      # Find corresponding trait CSV if it exists
+      trait_file <- file.path(output_path, "Differential_Hotspots", paste0(t_class, "_diet_Hotspot_Traits.csv"))
+      diff_traits <- if (file.exists(trait_file)) data.table::fread(trait_file) else NULL
+
+      class_res$diet <- list(density = density, diff_traits = diff_traits)
+    }
+
+    # Load Sex
+    sex_file <- file.path(output_path, paste0(t_class, "_sex_density.csv"))
+    if (file.exists(sex_file)) {
+      density <- data.table::fread(sex_file)
+      trait_file <- file.path(output_path, "Differential_Hotspots", paste0(t_class, "_sex_Hotspot_Traits.csv"))
+      diff_traits <- if (file.exists(trait_file)) data.table::fread(trait_file) else NULL
+
+      class_res$sex <- list(density = density, diff_traits = diff_traits)
+    }
+
+    all_results[[t_class]] <- class_res
+  }
+
+  # 2. Reconstruct S3 Object
+  # Note: window_size_mb and step_mb are technically lossy unless we saved them as params,
+  # but they are usually defaults (1 and 0.5)
+  res <- list(
+    results = all_results,
+    params = list(
+      phenotype_classes = trait_classes,
+      groups = c("HC", "HF", "female", "male"), # Inferred or placeholder
+      threshold = 15, # Placeholder
+      window_size_mb = 1,
+      step_mb = 0.5
+    )
+  )
+  class(res) <- "hotspot_analysis"
+  return(res)
+}

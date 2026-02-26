@@ -55,3 +55,20 @@ if (length(plots) > 0) {
 }
 
 message("Hotspot analysis results saved to: ", output_path)
+
+# Save Density Data for Exploration
+for (t_class in names(hs_res$results)) {
+  class_res <- hs_res$results[[t_class]]
+  if (!is.null(class_res$diet$density)) {
+    readr::write_csv(
+      class_res$diet$density,
+      file.path(output_path, paste0(t_class, "_diet_density.csv"))
+    )
+  }
+  if (!is.null(class_res$sex$density)) {
+    readr::write_csv(
+      class_res$sex$density,
+      file.path(output_path, paste0(t_class, "_sex_density.csv"))
+    )
+  }
+}

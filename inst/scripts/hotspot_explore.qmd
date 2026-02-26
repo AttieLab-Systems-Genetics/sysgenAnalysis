@@ -1,0 +1,49 @@
+---
+title: "Hotspot Exploration"
+author: "sysgenAnalysis"
+format: html
+---
+
+## Setup Environment
+
+```{r}
+#| message: false
+library(sysgenAnalysis)
+```
+
+## Configuration
+
+```{r config}
+# NOTE: If rendering from the package library, use 'quarto render ... --execute-dir .'
+# to ensure relative paths below resolve to your project directory.
+save_dir <- "byandell/output"
+base_output <- file.path(save_dir, "eQTL_Analysis")
+output_path <- file.path(base_output, "Hotspots")
+```
+
+## Load Results from CSVs
+
+```{r load-results}
+hs_res <- sysgenAnalysis::read_hotspot_analysis(output_path)
+```
+
+## Results
+
+### Summary
+
+```{r}
+print(hs_res)
+```
+
+### Hotspot Visualization
+
+```{r}
+#| fig-width: 14
+#| fig-height: 7
+plots <- plot(hs_res)
+
+# Display all plots
+for (name in names(plots)) {
+    print(plots[[name]])
+}
+```

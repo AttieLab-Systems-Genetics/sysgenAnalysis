@@ -1,0 +1,55 @@
+---
+title: "QTL Exploration: Specificity & Hotspots"
+author: "sysgenAnalysis"
+format: html
+---
+
+## Setup Environment
+
+```{r}
+#| message: false
+if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
+    devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
+}
+library(sysgenAnalysis)
+```
+
+## Configuration
+
+```{r config}
+# NOTE: If rendering from the package library, use 'quarto render ... --execute-dir .'
+# to ensure relative paths below resolve to your project directory.
+save_dir <- "byandell/output"
+output_path <- file.path(save_dir, "QTL_Differential_Analysis")
+```
+
+## Load Results from CSVs
+
+```{r load-results}
+qtl_res <- sysgenAnalysis::read_qtl_analysis(output_path)
+```
+
+## Results
+
+### Summary
+
+```{r}
+print(qtl_res)
+```
+
+### Specificity Table
+
+```{r}
+summary_table <- summary(qtl_res)
+if (!is.null(summary_table)) {
+    knitr::kable(summary_table)
+}
+```
+
+### Manhattan Plot
+
+```{r}
+#| fig-width: 16
+#| fig-height: 8
+plot(qtl_res)
+```

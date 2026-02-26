@@ -20,4 +20,5 @@ Imports:
     GenomicRanges,
     GenomicScores,
     GenomeInfoDb,
-    phastCons35way.UCSC.mm39
+    phastCons35way.UCSC.mm39,
+    quarto

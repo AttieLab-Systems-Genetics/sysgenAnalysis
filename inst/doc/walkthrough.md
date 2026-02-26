@@ -8,7 +8,7 @@
 
 0. **Set the [workflow] and [basename] variables from user input**:
     - [workflow]: The name of the workflow to refactor .
-    - [basename]: The `basename` of the workflow to refactor.
+    - [basename]: The `basename` to use for the refactored workflow.
 
 1. **Understand the workflow**: Read the [workflow] and understand what it does.
 
@@ -28,13 +28,18 @@
 5. **Verify Integration**: Check package and scripts, correcting any issues that arise.
     - Verify documents with `devtools::document()`.
     - Build the package.
-    - Run the quarto report to make sure it works.
+    - Run the [basename]_analysis.R script to make sure it works.
+
+6. **Create Exploration Document**: Create a Quarto document `inst/scripts/[basename]_explore.qmd` to explore the results saved by the analysis script.
+    - Use `sysgenAnalysis::read_[basename]_analysis(output_path)` to reconstruct the S3 object from CSV files.
+    - Focus on visualization and interactive summaries using the S3 methods (`print`, `summary`, `plot`).
+    - This approach ensures that exploration is fast (no re-running analysis) and transparent (uses human-readable CSVs).
 
 **Requested Files**:
 
 - `R/[basename].R`
 - `inst/scripts/[basename]_analysis.R`
-- `inst/scripts/[basename]_analysis.qmd` (Quarto version)
+- `inst/scripts/[basename]_explore.qmd`
 
 ## Preamble
 
@@ -49,6 +54,8 @@ This project focuses on two primary workflows, referred to as `[basename]_workfl
 - `conserve_workflow` (based on `prioritize_snps.R`)
 
 Subsequent sections in this walkthrough will detail the refactoring steps using the `qtl` or `conserve` basename (or generic `[basename]`) as the primary example.
+Section [2026-02-24: SNP Conservation Workflow Refactoring](#2026-02-24-snp-conservation-workflow-refactoring) was created using the [Workflow Prompt](#workflow-prompt)
+detailed above.
 
 ## Workflow Walkthroughs
 
@@ -58,6 +65,7 @@ Subsequent sections in this walkthrough will detail the refactoring steps using 
 - [2026-02-18: Interactive Quarto Reports](#2026-02-18-interactive-quarto-reports)
 - [2026-02-18: Bug Fixes and Automation Improvements](#2026-02-18-bug-fixes-and-automation-improvements)
 - [2026-02-24: SNP Conservation Workflow Refactoring](#2026-02-24-snp-conservation-workflow-refactoring)
+- [2026-02-26: Modular CSV-Based Workflow Exploration](#2026-02-26-modular-csv-based-workflow-exploration)
 
 ## 2026-02-11: QTL Analysis Workflow Refactoring
 
@@ -155,7 +163,7 @@ I've converted the core analysis scripts into Quarto markdown (`.qmd`) documents
 
 ### 1. New Quarto Documents
 
-- **`qtl_analysis.qmd`**: A full report for QTL specificity and integrated Manhattan plotting.
+- **`qtl_explore.qmd`**: A full report for QTL specificity and integrated Manhattan plotting.
 
 ### 2. How to Use
 
@@ -163,7 +171,7 @@ You can render these reports to HTML or PDF using the Quarto CLI or RStudio:
 
 ```bash
 # From the terminal
-quarto render inst/scripts/qtl_analysis.qmd
+quarto render inst/scripts/qtl_explore.qmd
 ```
 
 Within RStudio, simply open the `.qmd` file and click the **Render** button. These reports display plots inline and include a "Data Persistence" section that is disabled by default (to avoid accidental overwrites) but can be enabled to save the analysis artifacts.
@@ -198,6 +206,8 @@ library(sysgenAnalysis)
 
 ### 5. Verified Analysis Workflow
 
+Successfully verified the syntax of the new components and confirmed they align with the package's design patterns.
+
 ## 2026-02-24: SNP Conservation Workflow Refactoring
 
 Today's work focused on refactoring the SNP conservation and prioritization workflow into a modular, package-compliant structure.
@@ -221,7 +231,7 @@ Implemented the `conserve_analysis` S3 class to separate analysis from visualiza
 Created dedicated entry points that leverage the package core.
 
 - **`conserve_analysis.R`**: A clean script for batch processing and data saving.
-- **`conserve_analysis.qmd`**: A Quarto report that provides an interactive summary of the analysis, including tabbed Manhattan plots for all traits.
+- **`conserve_explore.qmd`**: A Quarto report that provides an interactive summary of the analysis, including tabbed Manhattan plots for all traits.
 
 ### 4. Cross-Platform Path Handling
 
@@ -230,3 +240,43 @@ Integrated the `research_dir()` helper to ensure that the workflow works seamles
 ### 5. Verified Workflow
 
 Successfully verified the syntax of the new components and confirmed they align with the package's design patterns.
+
+## 2026-02-26: Modular CSV-Based Workflow Exploration
+
+Today's work introduced a performant and transparent exploration model by pivoting from binary RDS files to modular CSV-based reconstruction.
+
+### 1. Transparent Data Persistence
+
+I refactored the analysis scripts to ensure all data required for visualization is saved as human-readable CSV files, removing the dependency on binary RDS files.
+
+- **QTL Analysis**: Now saves `QTL_Plot_Data.csv` and `QTL_Top_10_Hotspots.csv`.
+- **Hotspot Analysis**: Now saves `*_density.csv` files for each trait class.
+
+### 2. Package-Level Reconstruction Functions
+
+I moved the S3 object reconstruction logic into the package core to promote reuse and ensure consistency between analysis and exploration.
+
+- **`read_qtl_analysis()`**: Reassembles the `qtl_analysis` object from the specificity and hotspot CSVs.
+- **`read_conserve_analysis()`**: Reassembles the `conserve_analysis` object by scanning for trait-specific SNP prioritization files.
+- **`read_hotspot_analysis()`**: Reassembles the `hotspot_analysis` object from density and differential trait CSVs.
+
+### 3. Streamlined Exploration Documents
+
+The `_explore.qmd` documents were refactored to be thin visualization layers. They no longer contain complex data-loading logic; instead, they call the package's `read_*` functions to instantly restore the S3 objects for plotting and summarization using standard S3 methods.
+
+### 4. Simplified Workflow Helpers
+
+I added two high-level helpers to `R/common.R` to streamline the user experience:
+
+- **`run_analysis(basename)`**: Executes the full analysis pipeline (QTL, Hotspots, or SNPs) and saves the CSV results.
+- **`render_explore(basename)`**: Automates Quarto rendering to generate a project-relative HTML report.
+
+```r
+# New standard workflow
+sysgenAnalysis::run_analysis("qtl")
+sysgenAnalysis::render_explore("qtl", output_dir = ".")
+```
+
+### 6. Package Build and Installation Fixes
+
+To ensure the new scripts and help files are correctly included in the package, I updated the `.Rbuildignore` file to remove restrictions on the `inst/` directory. This allows the internal data-loading and rendering helpers to find the necessary files in the installed library.

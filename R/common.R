@@ -96,3 +96,55 @@ ensure_dir <- function(path) {
 clean_chr_factor <- function(chr_vector) {
   factor(chr_vector, levels = c(1:19, "X", "Y", "M"))
 }
+
+#' Render Exploration Report
+#'
+#' Simplifies rendering of exploration Quarto documents by handling path
+#' resolution and working directory flags.
+#'
+#' @param basename The basename of the workflow (e.g., "qtl", "hotspot", "conserve").
+#' @param output_dir The directory where the HTML file should be saved (default: current working directory).
+#'
+#' @importFrom quarto quarto_render
+#' @export
+render_explore <- function(basename, output_dir = getwd()) {
+  # 1. Resolve path to the .qmd file
+  qmd_file <- system.file("scripts", paste0(basename, "_explore.qmd"), package = "sysgenAnalysis")
+
+  if (qmd_file == "") {
+    stop(paste0("Exploration document not found for basename: ", basename))
+  }
+
+  # 2. Normalize output_dir to be absolute (avoids issues with "." resolving to library)
+  output_dir <- normalizePath(output_dir, mustWork = FALSE)
+
+  message("Rendering ", basename, " exploration to: ", output_dir)
+
+  quarto::quarto_render(
+    input = qmd_file,
+    output_file = paste0(basename, "_explore.html"),
+    execute_dir = getwd(),
+    quarto_args = c("--output-dir", output_dir)
+  )
+}
+
+#' Run Analysis Workflow
+#'
+#' Executes an analysis script from the package's `inst/scripts` directory.
+#'
+#' @param basename The basename of the workflow (e.g., "qtl", "hotspot", "conserve").
+#' @param ... Additional arguments passed to `source()`.
+#'
+#' @export
+run_analysis <- function(basename, ...) {
+  # 1. Resolve path to the .R file
+  r_file <- system.file("scripts", paste0(basename, "_analysis.R"), package = "sysgenAnalysis")
+
+  if (r_file == "") {
+    stop(paste0("Analysis script not found for basename: ", basename))
+  }
+
+  # 2. Source the script
+  message("Executing ", basename, " analysis script...")
+  source(r_file, ...)
+}

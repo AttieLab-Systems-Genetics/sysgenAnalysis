@@ -380,3 +380,43 @@ plot.conserve_analysis <- function(x, trait_name = NULL, ...) {
 
     return(p)
 }
+
+#' Read SNP Conservation Analysis Results from CSV
+#'
+#' Reconstructs a `conserve_analysis` object from saved CSV files.
+#'
+#' @param base_out Path to the directory containing the saved SNP conservation CSVs.
+#'
+#' @return An object of class `conserve_analysis`.
+#'
+#' @importFrom data.table fread
+#' @export
+read_conserve_analysis <- function(base_out) {
+    # 1. Load Global Hotspots
+    hs_file <- file.path(base_out, "global_hotspot_variants.csv")
+    if (!file.exists(hs_file)) {
+        stop("Hotspot CSV not found in: ", base_out)
+    }
+    hotspots <- data.table::fread(hs_file)
+
+    # 2. Load Trait-Specific Results
+    all_results <- list()
+    # We can identify trait directories as they contain 'prioritized_*.csv'
+    trait_dirs <- list.dirs(base_out, full.names = TRUE, recursive = FALSE)
+
+    for (d in trait_dirs) {
+        t_name <- basename(d)
+        csv_file <- file.path(d, paste0("prioritized_", t_name, "_snps.csv"))
+        if (file.exists(csv_file)) {
+            all_results[[t_name]] <- data.table::fread(csv_file)
+        }
+    }
+
+    # 3. Reconstruct S3 Object
+    res <- list(
+        all_results = all_results,
+        hotspots = hotspots
+    )
+    class(res) <- "conserve_analysis"
+    return(res)
+}

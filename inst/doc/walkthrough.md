@@ -28,7 +28,7 @@
 5. **Verify Integration**: Check package and scripts, correcting any issues that arise.
     - Verify documents with `devtools::document()`.
     - Build the package.
-    - Run the analyze_[basename].R script to make sure it works.
+    - Ask user whether or not to run the analyze_[basename].R script to make sure it works.
 
 6. **Create Exploration Document**: Create a Quarto document `inst/scripts/explore_[basename].qmd` to explore the results saved by the analysis script.
     - Use `sysgenAnalysis::read_[basename]_analysis(output_path)` to reconstruct the S3 object from CSV files.

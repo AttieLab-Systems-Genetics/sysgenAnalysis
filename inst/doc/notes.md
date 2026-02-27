@@ -19,3 +19,5 @@ Use Quarto and try to make them dynamic.
 
 - Adapt scripts/explore_[basename].qmd to explore saved plots (PNG) and tables (CSV).
 - Document how this is adapted in that Quarto document.
+
+render_explore for dynamic document does not use output_dir. Somehow update how this works.

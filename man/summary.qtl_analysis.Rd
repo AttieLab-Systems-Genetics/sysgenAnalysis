@@ -4,15 +4,19 @@
 \alias{summary.qtl_analysis}
 \title{Summary of QTL Analysis}
 \usage{
-\method{summary}{qtl_analysis}(object, ...)
+\method{summary}{qtl_analysis}(object, type = c("specificity", "hotspots"), digits = 4, ...)
 }
 \arguments{
 \item{object}{An object of class \code{qtl_analysis}.}
 
+\item{type}{Type of summary: "specificity" (default) or "hotspots".}
+
+\item{digits}{Number of significant digits (default 4).}
+
 \item{...}{Extra arguments (ignored).}
 }
 \value{
-A data frame containing the QTL specificity summary.
+A data frame containing the requested summary with rounded numeric values.
 }
 \description{
 Summary of QTL Analysis

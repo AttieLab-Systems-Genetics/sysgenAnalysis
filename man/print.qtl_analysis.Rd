@@ -4,12 +4,14 @@
 \alias{print.qtl_analysis}
 \title{Print QTL Analysis Result}
 \usage{
-\method{print}{qtl_analysis}(x, ...)
+\method{print}{qtl_analysis}(x, digits = 4, ...)
 }
 \arguments{
 \item{x}{An object of class \code{qtl_analysis}.}
 
-\item{...}{Extra arguments (ignored).}
+\item{digits}{Number of significant digits for numeric values (default 4).}
+
+\item{...}{Extra arguments (passed to print).}
 }
 \description{
 Print QTL Analysis Result

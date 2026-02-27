@@ -44,8 +44,8 @@ To render exploration reports, use the package helper:
 
 ```r
 # This will save the HTML in your current folder
-sysgenAnalysis::render_explore("qtl", output_dir = ".")
-sysgenAnalysis::render_explore("hotspot", output_dir = ".")
+sysgenAnalysis::render_explore("qtl")
+sysgenAnalysis::render_explore("hotspot")
 ```
 
 ## Code Development

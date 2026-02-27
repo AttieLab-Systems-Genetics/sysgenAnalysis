@@ -1,4 +1,5 @@
 # Link to shared infrastructure (removed for package structure)
+utils::globalVariables(c("phenotype", "qtl_chr", "qtl_pos", "qtl_lod", "qtl_status", "is_shared", "Length", "offset", "BP_cum", "chr_col", "trait_class", "group", "n_liver_metab", "n_plasma_metab", "n_liver_lipids", "n_clinical", "cum_pos", "max_lod", "cum_center", "has_2_plus", "has_other", "n_classes"))
 
 #' Determine QTL Specificity
 #'
@@ -305,11 +306,12 @@ run_qtl_analysis <- function(phenotype_classes,
 #' Print QTL Analysis Result
 #'
 #' @param x An object of class `qtl_analysis`.
-#' @param ... Extra arguments (ignored).
+#' @param digits Number of significant digits for numeric values (default 4).
+#' @param ... Extra arguments (passed to print).
 #'
 #' @export
-print.qtl_analysis <- function(x, ...) {
-  cat("QTL Analysis Result Object\n")
+print.qtl_analysis <- function(x, digits = 4, ...) {
+  cat("QTL Analysis Result Object (Numeric values rounded to", digits, "significant digits)\n")
   cat("--------------------------\n")
   cat("Trait Classes: ", paste(x$params$phenotype_classes, collapse = ", "), "\n")
   cat("Groups:        ", paste(x$params$groups, collapse = ", "), "\n")
@@ -321,27 +323,71 @@ print.qtl_analysis <- function(x, ...) {
 #' Summary of QTL Analysis
 #'
 #' @param object An object of class `qtl_analysis`.
+#' @param type Type of summary: "specificity" (default) or "hotspots".
+#' @param digits Number of significant digits (default 4).
 #' @param ... Extra arguments (ignored).
 #'
-#' @return A data frame containing the QTL specificity summary.
+#' @return A data frame containing the requested summary with rounded numeric values.
 #'
+#' @importFrom dplyr mutate across where
 #' @export
-summary.qtl_analysis <- function(object, ...) {
-  return(object$summary_table)
+summary.qtl_analysis <- function(object, type = c("specificity", "hotspots"), digits = 4, ...) {
+  type <- match.arg(type)
+
+  df <- if (type == "specificity") {
+    object$summary_table
+  } else {
+    object$final_hs
+  }
+
+  if (is.null(df)) {
+    return(NULL)
+  }
+
+  # Round numeric columns to significant digits
+  df <- df |>
+    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), \(v) signif(v, digits = digits)))
+
+  return(as.data.frame(df))
 }
 
 #' Plot QTL Analysis
 #'
 #' @param x An object of class `qtl_analysis`.
+#' @param chr Optional: Chromosomes to include (e.g., c("1", "2")).
+#' @param trait_class Optional: Trait classes to include.
+#' @param lod_thresh Optional: Minimum LOD score threshold.
 #' @param ... Extra arguments (passed to ggsave if saving).
 #'
 #' @return A ggplot object.
 #'
 #' @importFrom ggplot2 ggplot aes geom_rect geom_segment geom_point geom_text scale_fill_manual scale_shape_manual scale_x_continuous scale_y_continuous guides guide_legend labs theme_minimal theme element_blank
+#' @importFrom dplyr filter
 #' @export
-plot.qtl_analysis <- function(x, ...) {
+plot.qtl_analysis <- function(x, chr = NULL, trait_class = NULL, lod_thresh = NULL, ...) {
   if (is.null(x$plot_data) || is.null(x$top_10_hs)) {
     warning("No plot data available.")
+    return(NULL)
+  }
+
+  # Apply Filters
+  df_plot <- x$plot_data
+  df_hs <- x$top_10_hs
+
+  if (!is.null(chr)) {
+    df_plot <- df_plot |> dplyr::filter(qtl_chr %in% chr)
+    df_hs <- df_hs |> dplyr::filter(qtl_chr %in% chr)
+  }
+  if (!is.null(trait_class)) {
+    df_plot <- df_plot |> dplyr::filter(trait_class %in% trait_class)
+  }
+  if (!is.null(lod_thresh)) {
+    df_plot <- df_plot |> dplyr::filter(qtl_lod >= lod_thresh)
+    df_hs <- df_hs |> dplyr::filter(max_lod >= lod_thresh)
+  }
+
+  if (nrow(df_plot) == 0) {
+    warning("No data left after filtering.")
     return(NULL)
   }
 
@@ -352,17 +398,16 @@ plot.qtl_analysis <- function(x, ...) {
   )
   group_shapes <- c("HC" = 21, "HF" = 24, "female" = 22, "male" = 23)
 
-  top_10_hs <- x$top_10_hs
-  top_10_hs$label <- paste0("Chr", top_10_hs$qtl_chr, ":", round(top_10_hs$pos_at_max, 1), "Mb")
+  df_hs$label <- paste0("Chr", df_hs$qtl_chr, ":", round(df_hs$pos_at_max, 1), "Mb")
 
-  p <- ggplot2::ggplot(x$plot_data, ggplot2::aes(x = cum_pos, y = qtl_lod)) +
+  p <- ggplot2::ggplot(df_plot, ggplot2::aes(x = cum_pos, y = qtl_lod)) +
     ggplot2::geom_rect(
       data = GLOBAL_MAP |> dplyr::filter(dplyr::row_number() %% 2 == 0),
       ggplot2::aes(xmin = offset, xmax = offset + Length, ymin = 0, ymax = Inf),
       fill = "grey95", color = NA, inherit.aes = FALSE
     ) +
     ggplot2::geom_segment(
-      data = top_10_hs,
+      data = df_hs,
       ggplot2::aes(
         x = cum_center, xend = cum_center,
         y = max_lod + 2, yend = 92
@@ -373,7 +418,7 @@ plot.qtl_analysis <- function(x, ...) {
       size = 6, color = "black", stroke = 0.3, alpha = 0.7
     ) +
     ggplot2::geom_text(
-      data = top_10_hs, ggplot2::aes(x = cum_center, y = 95, label = label),
+      data = df_hs, ggplot2::aes(x = cum_center, y = 95, label = label),
       angle = 90, vjust = -0.5, size = 14 * 0.3,
       color = "black", fontface = "bold", inherit.aes = FALSE
     ) +

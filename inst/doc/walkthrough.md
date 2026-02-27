@@ -269,12 +269,12 @@ The `explore_[basename].qmd` documents were refactored to be thin visualization 
 I added two high-level helpers to `R/common.R` to streamline the user experience:
 
 - **`run_analysis(basename)`**: Executes the full analysis pipeline (QTL, Hotspots, or SNPs) and saves the CSV results.
-- **`render_explore(basename, output_dir)`**: Automates Quarto rendering to generate a project-relative HTML report.
+- **`render_explore(basename)`**: Automates Quarto rendering to generate a project-relative HTML report.
 
 ```r
 # New standard workflow
 sysgenAnalysis::run_analysis("qtl")
-sysgenAnalysis::render_explore("qtl", output_dir = ".")
+sysgenAnalysis::render_explore("qtl")
 ```
 
 ### 6. Package Build and Installation Fixes

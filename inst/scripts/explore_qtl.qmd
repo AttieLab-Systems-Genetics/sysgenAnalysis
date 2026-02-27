@@ -2,6 +2,7 @@
 title: "QTL Exploration: Specificity & Hotspots"
 author: "sysgenAnalysis"
 format: html
+server: shiny
 ---
 
 ## Setup Environment
@@ -12,6 +13,8 @@ if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
     devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
 }
 library(sysgenAnalysis)
+library(DT)
+library(shiny)
 ```
 
 ## Configuration
@@ -19,7 +22,8 @@ library(sysgenAnalysis)
 ```{r config}
 # NOTE: If rendering from the package library, use 'quarto render ... --execute-dir .'
 # to ensure relative paths below resolve to your project directory.
-save_dir <- "byandell/output"
+proj_root <- if (dir.exists("byandell/output")) "." else "../.."
+save_dir <- file.path(proj_root, "byandell/output")
 output_path <- file.path(save_dir, "QTL_Differential_Analysis")
 ```
 
@@ -34,22 +38,46 @@ qtl_res <- sysgenAnalysis::read_qtl_analysis(output_path)
 ### Summary
 
 ```{r}
-print(qtl_res)
+DT::datatable(summary(qtl_res, type = "hotspots"))
 ```
 
 ### Specificity Table
 
 ```{r}
-summary_table <- summary(qtl_res)
-if (!is.null(summary_table)) {
-    knitr::kable(summary_table)
+if (!is.null(qtl_res$summary_table)) {
+    DT::datatable(summary(qtl_res, type = "specificity"))
 }
 ```
 
-### Manhattan Plot
+### Interactive Manhattan Plot
 
 ```{r}
-#| fig-width: 16
-#| fig-height: 8
-plot(qtl_res)
+#| panel: sidebar
+all_chrs <- unique(qtl_res$plot_data$qtl_chr)
+all_classes <- unique(qtl_res$plot_data$trait_class)
+max_lod <- max(qtl_res$plot_data$qtl_lod, na.rm = TRUE)
+
+checkboxGroupInput("chrs", "Select Chromosomes:",
+                   choices = all_chrs, selected = all_chrs, inline = TRUE)
+
+checkboxGroupInput("classes", "Select Trait Classes:",
+                   choices = all_classes, selected = all_classes)
+
+sliderInput("lod", "Minimum LOD Score:",
+            min = 0, max = floor(max_lod), value = 7, step = 1)
+```
+
+```{r}
+#| panel: fill
+plotOutput("manhattan_plot", height = "600px")
+```
+
+```{r}
+#| context: server
+output$manhattan_plot <- renderPlot({
+  plot(qtl_res, 
+       chr = input$chrs, 
+       trait_class = input$classes, 
+       lod_thresh = input$lod)
+})
 ```

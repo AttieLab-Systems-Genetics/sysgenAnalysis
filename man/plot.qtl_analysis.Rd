@@ -4,10 +4,16 @@
 \alias{plot.qtl_analysis}
 \title{Plot QTL Analysis}
 \usage{
-\method{plot}{qtl_analysis}(x, ...)
+\method{plot}{qtl_analysis}(x, chr = NULL, trait_class = NULL, lod_thresh = NULL, ...)
 }
 \arguments{
 \item{x}{An object of class \code{qtl_analysis}.}
+
+\item{chr}{Optional: Chromosomes to include (e.g., c("1", "2")).}
+
+\item{trait_class}{Optional: Trait classes to include.}
+
+\item{lod_thresh}{Optional: Minimum LOD score threshold.}
 
 \item{...}{Extra arguments (passed to ggsave if saving).}
 }

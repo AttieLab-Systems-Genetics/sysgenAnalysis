@@ -105,7 +105,7 @@ clean_chr_factor <- function(chr_vector) {
 #' @param basename The basename of the workflow (e.g., "qtl", "hotspot", "conserve").
 #' @param output_dir The directory where the HTML file should be saved (default: current working directory).
 #'
-#' @importFrom quarto quarto_render
+#' @importFrom quarto quarto_render quarto_serve
 #' @export
 render_explore <- function(basename, output_dir = getwd()) {
   # 1. Resolve path to the .qmd file
@@ -120,12 +120,17 @@ render_explore <- function(basename, output_dir = getwd()) {
 
   message("Rendering ", basename, " exploration to: ", output_dir)
 
-  quarto::quarto_render(
-    input = qmd_file,
-    output_file = paste0("explore_", basename, ".html"),
-    execute_dir = getwd(),
-    quarto_args = c("--output-dir", output_dir)
-  )
+  if (length(grep("server: *shiny", readLines(qmd_file)))) {
+    quarto::quarto_serve(input = qmd_file)
+  } else {
+    quarto::quarto_render(
+      input = qmd_file,
+      output_file = paste0("explore_", basename, ".html"),
+      execute_dir = getwd(),
+      quarto_args = c("--output-dir", output_dir)
+    )
+  }
+  return(invisible())
 }
 
 #' Run Analysis Workflow

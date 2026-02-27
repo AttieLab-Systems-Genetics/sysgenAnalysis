@@ -15,27 +15,20 @@ for all workflows.
 ## Exploring Results of Workflows
 
 This may be fine-tuned to individual workflows.
-Use Quarto and try to make them dynamic.
+Use Quarto and make them dynamic.
 
-- Adapt scripts/explore_[basename].qmd to explore saved plots (PNG) and tables (CSV).
+- Adapt scripts/explore_[basename].qmd to explore saved tables (CSV).
 - Document how this is adapted in that Quarto document.
 
-render_explore for dynamic document does not use output_dir. Somehow update how this works.
+Issues
+
+- `plot.qtl_analysis` element `plot_data` uses `cum_pos` for position
+rather than using qtl2::plot.scan1.
+- `qtl_chr` in same element is char rather than factor, so need
+something like the following:
 
 ```
-> sysgenAnalysis::render_explore("qtl")
-Rendering qtl exploration to: /Users/brianyandell/Documents/GitHub/sysgenAnalysis
-ERROR: explore_qtl.qmd is a knitr engine document that uses server: shiny so cannot be included in a project with an output-dir (shiny document output must be rendered alongside its source document).
-Error in `quarto::quarto_render()`:
-! Error running quarto CLI from R.
-Caused by error in `quarto::quarto_render()`:
-✖ Error returned by quarto CLI.
-  -----------------------------
-  ERROR: explore_qtl.qmd is a knitr engine document that uses server: shiny
-  so cannot be included in a project with an output-dir (shiny document
-  output must be rendered alongside its source document).
-  
-Caused by error:
-! System command 'quarto' failed
-Run `rlang::last_trace()` to see where the error occurred.
+all_chrs <- levels(reorder(qtl_res$plot_data$qtl_chr,
+                             qtl_res$plot_data$cum_pos))
 ```
+

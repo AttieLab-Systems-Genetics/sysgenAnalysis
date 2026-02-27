@@ -337,7 +337,10 @@ summary.qtl_analysis <- function(object, type = c("specificity", "hotspots"), di
   df <- if (type == "specificity") {
     object$summary_table
   } else {
-    object$final_hs
+    object$final_hs |>
+      dplyr::select(-Traits_List) |>
+      dplyr::arrange(dplyr::desc(Total_Traits)) |>
+      dplyr::select(Total_Traits, dplyr::everything())
   }
 
   if (is.null(df)) {
@@ -355,7 +358,7 @@ summary.qtl_analysis <- function(object, type = c("specificity", "hotspots"), di
 #'
 #' @param x An object of class `qtl_analysis`.
 #' @param chr Optional: Chromosomes to include (e.g., c("1", "2")).
-#' @param trait_class Optional: Trait classes to include.
+#' @param trait_classes Optional: Trait classes to include.
 #' @param lod_thresh Optional: Minimum LOD score threshold.
 #' @param ... Extra arguments (passed to ggsave if saving).
 #'
@@ -364,7 +367,7 @@ summary.qtl_analysis <- function(object, type = c("specificity", "hotspots"), di
 #' @importFrom ggplot2 ggplot aes geom_rect geom_segment geom_point geom_text scale_fill_manual scale_shape_manual scale_x_continuous scale_y_continuous guides guide_legend labs theme_minimal theme element_blank
 #' @importFrom dplyr filter
 #' @export
-plot.qtl_analysis <- function(x, chr = NULL, trait_class = NULL, lod_thresh = NULL, ...) {
+plot.qtl_analysis <- function(x, chr = NULL, trait_classes = NULL, lod_thresh = NULL, ...) {
   if (is.null(x$plot_data) || is.null(x$top_10_hs)) {
     warning("No plot data available.")
     return(NULL)
@@ -378,8 +381,8 @@ plot.qtl_analysis <- function(x, chr = NULL, trait_class = NULL, lod_thresh = NU
     df_plot <- df_plot |> dplyr::filter(qtl_chr %in% chr)
     df_hs <- df_hs |> dplyr::filter(qtl_chr %in% chr)
   }
-  if (!is.null(trait_class)) {
-    df_plot <- df_plot |> dplyr::filter(trait_class %in% trait_class)
+  if (!is.null(trait_classes)) {
+    df_plot <- df_plot |> dplyr::filter(trait_class %in% trait_classes)
   }
   if (!is.null(lod_thresh)) {
     df_plot <- df_plot |> dplyr::filter(qtl_lod >= lod_thresh)

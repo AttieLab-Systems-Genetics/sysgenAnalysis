@@ -1,0 +1,80 @@
+---
+title: "QTL Exploration: Specificity & Hotspots"
+author: "sysgenAnalysis"
+output: html-document
+---
+
+## Setup Environment
+
+```{r}
+#| context: setup
+#| include: false
+#| message: false
+if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
+    devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
+}
+```
+
+## Configuration
+
+```{r config}
+proj_root <- if (dir.exists("byandell/output")) "." else "../.."
+save_dir <- file.path(proj_root, "byandell/output")
+output_path <- file.path(save_dir, "QTL_Differential_Analysis")
+```
+
+## Load Results from CSVs
+
+```{r}
+qtl_res <- sysgenAnalysis::read_qtl_analysis(output_path)
+```
+
+## Results
+
+### Summary
+
+```{r hotspots}
+DT::datatable(summary(qtl_res, type = "hotspots"))
+```
+
+### Specificity Table
+
+```{r}
+if (!is.null(qtl_res$summary_table)) {
+  DT::datatable(summary(qtl_res, type = "specificity"))
+}
+```
+
+### Interactive Manhattan Plot
+
+```{r}
+#| panel: sidebar
+all_chrs <- levels(reorder(qtl_res$plot_data$qtl_chr,
+                             qtl_res$plot_data$cum_pos))
+all_classes <- unique(qtl_res$plot_data$trait_class)
+max_lod <- max(qtl_res$plot_data$qtl_lod, na.rm = TRUE)
+
+shiny::checkboxGroupInput("chrs", "Select Chromosomes:",
+                   choices = all_chrs, selected = all_chrs, inline = TRUE)
+
+shiny::checkboxGroupInput("classes", "Select Trait Classes:",
+                   choices = all_classes, selected = all_classes)
+
+shiny::sliderInput("lod", "Minimum LOD Score:",
+            min = 0, max = floor(max_lod), value = 7, step = 1)
+```
+
+```{r}
+#| panel: fill
+shiny::plotOutput("manhattan_plot", height = "600px")
+```
+
+```{r}
+#| context: server
+output$manhattan_plot <- shiny::renderPlot({
+  plot(qtl_res, 
+       chr = input$chrs, 
+       trait_class = input$classes, 
+       lod_thresh = input$lod)
+})
+```

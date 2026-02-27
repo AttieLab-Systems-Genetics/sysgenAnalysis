@@ -1,6 +1,6 @@
 Package: sysgenAnalysis
 Title: Systems Genetics Analysis for Attie Lab
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Brian", "Yandell", email = "brian.yandell@wisc.edu", role = c("aut", "cre"))
 Description: Routines for systems analysis, including trans-eQTL hotspot density calculation and visualization.
 License: GPL-3

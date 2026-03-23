@@ -4,68 +4,138 @@ subtitle: "Prioritizing SNPs using GenomicScores and SIFT"
 author: "sysgenAnalysis"
 format:
   html:
-    toc: true
-    code-fold: true
+    toc: false
     theme: cosmo
+server: shiny
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
-
-if (!requireNamespace("sysgenAnalysis", quietly = TRUE)) {
-  devtools::install_github("AttieLab-Systems-Genetics/sysgenAnalysis")
-}
+#| context: setup
 library(sysgenAnalysis)
 library(ggplot2)
 library(data.table)
-```
+library(shiny)
+library(DT)
+library(downr)
 
-## Configuration
-
-```{r config}
-# NOTE: If rendering from the package library, use 'quarto render ... --execute-dir .'
-# to ensure relative paths below resolve to your project directory.
+# Configuration
 base_research_dir <- research_dir()
 base_out <- file.path(dirname(base_research_dir), "Projects2/Antigravity/SNP_conservation")
-```
 
-## Load Results from CSVs
-
-```{r load-results}
+# Load Results
 results <- sysgenAnalysis::read_conserve_analysis(base_out)
+trait_names <- names(results$all_results)
 ```
 
-## Results Summary
+::: {.panel-tabset}
 
-### Overall Statistics
+## Summary
 
-```{r summary}
-summary(results)
+```{r}
+tagList(
+  renderPrint({ summary(results) }),
+  hr(),
+  h4("Debug: Counts"),
+  verbatimTextOutput("debug_counts")
+)
 ```
 
-### Global Hotspots
+## Tables
 
-Top variants found across multiple trait classes.
-
-```{r hotspots-table}
-knitr::kable(head(results$hotspots[, .(variant_id, gene_symbol, trait_class_count, trait_classes, max_priority)], 20))
+```{r}
+fluidRow(
+  column(4,
+    selectInput("table_type", "Table Type", 
+                choices = c("Global Hotspots", "Trait-Specific")),
+    uiOutput("trait_select_table"),
+    downr::downloadUI("download_table")
+  ),
+  column(8,
+    DT::dataTableOutput("out_table")
+  )
+)
 ```
 
-## Visualizations
+## Plots
 
-### Global Hotspot Manhattan Plot
-
-```{r plot-global, fig.width=14, fig.height=6}
-plot(results)
+```{r}
+fluidRow(
+  column(4,
+    selectInput("plot_type", "Plot Type", 
+                choices = c("Global Hotspot", "Trait-Specific")),
+    uiOutput("trait_select_plot"),
+    downr::downloadUI("download_plot")
+  ),
+  column(8,
+    plotOutput("out_plot", height = "600px")
+  )
+)
 ```
 
-### Trait-Specific Manhattan Plots {.tabset}
+:::
 
-```{r plot-traits, results='asis', fig.width=14, fig.height=6}
-for (t_name in names(results$all_results)) {
-  cat("\n#### ", t_name, "\n")
-  p <- plot(results, trait_name = t_name)
-  print(p)
-  cat("\n")
-}
+```{r}
+#| context: server
+
+# Dynamic selectors for traits
+output$trait_select_table <- renderUI({
+  if (input$table_type == "Trait-Specific") {
+    selectInput("selected_trait_table", "Select Trait", 
+                choices = trait_names)
+  }
+})
+
+output$trait_select_plot <- renderUI({
+  if (input$plot_type == "Trait-Specific") {
+    selectInput("selected_trait_plot", "Select Trait", 
+                choices = trait_names)
+  }
+})
+
+# Reactive data for table
+reactive_table <- reactive({
+  if (input$table_type == "Global Hotspots") {
+    results$hotspots
+  } else {
+    req(input$selected_trait_table)
+    results$all_results[[input$selected_trait_table]]
+  }
+})
+
+output$out_table <- DT::renderDataTable({
+  datatable(reactive_table(), 
+            options = list(pageLength = 10, scrollX = TRUE),
+            rownames = FALSE)
+})
+
+# Reactive plot
+reactive_plot <- reactive({
+  if (input$plot_type == "Global Hotspot") {
+    plot(results)
+  } else {
+    req(input$selected_trait_plot)
+    plot(results, trait_name = input$selected_trait_plot)
+  }
+})
+
+output$out_plot <- renderPlot({
+  p <- reactive_plot()
+  if (is.null(p)) {
+    return(NULL)
+  }
+  p
+})
+
+# Debug output for counts
+output$debug_counts <- renderPrint({
+  list(
+    hotspots_count = nrow(results$hotspots),
+    traits_available = names(results$all_results),
+    trait_counts = sapply(results$all_results, nrow)
+  )
+})
+
+# Download servers
+downr::downloadServer("download_table", reactive_table)
+downr::downloadServer("download_plot", reactive_plot)
 ```

@@ -6,34 +6,37 @@
 
 **Instructions**:
 
-0. **Set the [workflow] and [basename] variables from user input**:
+1. **Set the [workflow] and [basename] variables from user input**:
     - [workflow]: The name of the workflow to refactor .
     - [basename]: The `basename` to use for the refactored workflow.
 
-1. **Understand the workflow**: Read the [workflow] and understand what it does.
+2. **Understand the workflow**: Read the [workflow] and understand what it does.
 
-2. **Extract Functions**: Move all logical units (data processing, analysis, plotting) into `R/[basename].R`.
+3. **Extract Functions**: Move all logical units (data processing, analysis, plotting) into `R/[basename].R`.
     - Document each function with **Roxygen2** syntax (including `@param`, `@return`, and `@export`).
     - Use R native pipes (`|>`) and explicit namespace calls (e.g., `dplyr::mutate`).
     - Centralize shared constants (like coordinate maps) if not already in `common.R`.
 
-3. **Create Entry Script**: Create an execution script `inst/scripts/analyze_[basename].R`.
+4. **Create Entry Script**: Create an execution script `inst/scripts/analyze_[basename].R`.
     - Use it as a clean entry point that calls the functions defined in `R/`.
     - Handle environment setup, file paths, and high-level execution flow here.
 
-4. **Return S3 Objects**: Refactor the main "run" function to return an S3 object of class `[basename]_analysis`.
+5. **Return S3 Objects**: Refactor the main "run" function to return an S3 object of class `[basename]_analysis`.
     - Implement `print`, `summary`, and `plot` methods in `R/[basename].R`.
     - Move file-saving logic (`write.csv`, `ggsave`) out of the functions and into the entry script.
 
-5. **Verify Integration**: Check package and scripts, correcting any issues that arise.
+6. **Verify Integration**: Check package and scripts, correcting any issues that arise.
     - Verify documents with `devtools::document()`.
     - Build the package.
     - Ask user whether or not to run the analyze_[basename].R script to make sure it works.
 
-6. **Create Exploration Document**: Create a Quarto document `inst/scripts/explore_[basename].qmd` to explore the results saved by the analysis script.
-    - Use `sysgenAnalysis::read_[basename]_analysis(output_path)` to reconstruct the S3 object from CSV files.
-    - Focus on visualization and interactive summaries using the S3 methods (`print`, `summary`, `plot`).
-    - This approach ensures that exploration is fast (no re-running analysis) and transparent (uses human-readable CSVs).
+7. **Create Exploration Document**: Create an interactive Shiny-based Quarto document `inst/scripts/explore_[basename].qmd` allowing for dynamic filtering and exploration.
+    - Set `server: shiny` in the YAML header.
+    - Use `context: setup` to load data via `sysgenAnalysis::read_[basename]_analysis()`.
+    - Use `::: {.panel-tabset}` to organize sections into **Summary**, **Tables**, and **Plots**.
+    - Use Shiny's `fluidRow` and `column` within each tab to create a side-bar like experience for controls next to outputs.
+    - Integrate `downr::downloadUI` and `downr::downloadServer` for exporting tables and plots.
+    - This approach provides a premium, interactive experience while keeping rendering fast by loading pre-calculated CSVs.
 
 **Requested Files**:
 
@@ -66,6 +69,7 @@ detailed above.
 - [2026-02-18: Bug Fixes and Automation Improvements](#2026-02-18-bug-fixes-and-automation-improvements)
 - [2026-02-24: SNP Conservation Workflow Refactoring](#2026-02-24-snp-conservation-workflow-refactoring)
 - [2026-02-26: Modular CSV-Based Workflow Exploration](#2026-02-26-modular-csv-based-workflow-exploration)
+- [2026-03-23: Interactive Shiny-Based Exploration Refactoring](#2026-03-23-interactive-shiny-based-exploration-refactoring)
 
 ## 2026-02-11: QTL Analysis Workflow Refactoring
 
@@ -280,3 +284,30 @@ sysgenAnalysis::render_explore("qtl")
 ### 6. Package Build and Installation Fixes
 
 To ensure the new scripts and help files are correctly included in the package, I updated the `.Rbuildignore` file to remove restrictions on the `inst/` directory. This allows the internal data-loading and rendering helpers to find the necessary files in the installed library.
+
+## 2026-03-23: Interactive Shiny-Based Exploration Refactoring
+
+Refactored the SNP conservation exploration script into a robust Shiny-based application within Quarto, providing an interactive dashboard for data discovery.
+
+### 1. Interactive Dashboard UI
+
+Completely redesigned the layout to provide a professional, multi-tabbed interface:
+- **Summary**: Direct access to overall statistics and debug counts.
+- **Tables**: Searchable, paginated tables for both global hotspots and trait-specific results, with dynamic sidebar controls.
+- **Plots**: High-quality Manhattan plots (global and trait-specific) with interactive controls for trait selection.
+
+### 2. Standardized Layout with `fluidRow`
+
+Adopted Shiny's `fluidRow` and `column` system inside Quarto's `panel-tabset`. This architecture ensures that input controls and outputs are consistently aligned and fully responsive, solving previous visibility issues with direct Quarto layout blocks in a Shiny context.
+
+### 3. Integrated Data Export
+
+Enabled easy data extraction by integrating the `downr` package. Each result panel (Tables and Plots) now features a dedicated download button that provides the current view's data or plot.
+
+### 4. Plotting Performance Optimization
+
+Optimized the `plot.conserve_analysis` S3 method in `R/conserve.R` by implementing a caching mechanism for the large `phastCons` genomic scores object. By loading this object into a package-level cache once per session, plot rendering time was reduced from several seconds to instantaneous updates.
+
+### 5. Verified Development Workflow
+
+Confirmed that running `quarto preview` on the local file in `inst/scripts/` is the preferred way to live-preview Shiny changes, ensuring the latest source code is executed.

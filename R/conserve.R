@@ -279,8 +279,11 @@ summary.conserve_analysis <- function(object, ...) {
 #' @importFrom GenomeInfoDb seqinfo seqlengths
 #' @export
 plot.conserve_analysis <- function(x, trait_name = NULL, ...) {
-    # Load genome background
-    phast_mm39 <- GenomicScores::getGScores("phastCons35way.UCSC.mm39")
+    # Load genome background (cached if possible)
+    if (!exists(".phast_mm39_cache", envir = .GlobalEnv)) {
+        assign(".phast_mm39_cache", GenomicScores::getGScores("phastCons35way.UCSC.mm39"), envir = .GlobalEnv)
+    }
+    phast_mm39 <- get(".phast_mm39_cache", envir = .GlobalEnv)
     si <- GenomeInfoDb::seqinfo(phast_mm39)
     chr_lengths_raw <- GenomeInfoDb::seqlengths(si)
 
